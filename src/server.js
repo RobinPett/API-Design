@@ -19,6 +19,10 @@ fastifyApp.setErrorHandler((error, request, reply) => {
   }
 })
 
+fastifyApp.get('/', async (request, reply) => {
+  reply.send({ message: 'Welcome to the Game GraphQL API' })
+})
+
 // Run server
 try {
   // Connect to mongoDB
