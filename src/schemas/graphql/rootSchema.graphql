@@ -1,6 +1,22 @@
 type Query {
     developers(limit: Int): [Developer]
     developer(id: ID!): Developer
+    games(developer: ID, platform: ID, genre: ID, release_year: Int, limit: Int): [Game]
+    game(id: ID!): Game
+    platforms: [Platform]
+    platform(id: ID!): Platform
+    genres: [Genre]
+    genre(id: ID, gameId: ID): Genre
+    ratings: [Rating]
+    rating(id: ID, gameId: ID): Rating
+  }
+
+  type Mutation {
+    registerUser(data: CreateUserInput!): User!
+    loginUser(data: CreateLoginInput!): AuthPayload!
+    addGame(data: CreateGameInput!): Game!
+    deleteGame(id: ID!): Game!
+    updateGame(id: ID!, data: UpdateGameInput!): Game!
   }
 
   type Developer {
@@ -8,24 +24,14 @@ type Query {
     name: String!
     games: [Game]
 }
-  type Query {
-    games(developer: ID, platform: ID, genre: ID, release_year: Int, limit: Int): [Game]
-    game(id: ID!): Game
-  }
-
-  type Mutation {
-    addGame(data: CreateGameInput!): Game!
-    deleteGame(id: ID!): Game!
-    updateGame(id: ID!, data: UpdateGameInput!): Game!
-  }
 
   type Game {
     id: ID!
     title: String!
     release_year: Int!
-    genre: [String]
-    platforms: [String]!
-    rating: String
+    genres: [Genre]
+    platforms: [Platform]!
+    rating: Rating
     developers: [Developer]!
   }  
 
@@ -42,41 +48,25 @@ type Query {
   input UpdateGameInput {
     title: String
     release_year: Int
-    genre: [ID]
+    genres: [ID]
     platforms: [ID]
     rating: ID
     developers: [ID]
-  }
-  type Query {
-    genres: [Genre]
-    genre(id: ID!): Genre
   }
 
   type Genre {
     id: ID!
     name: String!
   }
-  type Query {
-    platforms: [Platform]
-    platform(id: ID!): Platform
-  }
 
   type Platform {
     id: ID!
     name: String!
   }
-  type Query {
-    ratings: [Rating]
-    rating(gameId: ID!): Rating
-  }
 
   type Rating {
     id: ID!
     text: String!
-  }
-  type Mutation {
-    registerUser(data: CreateUserInput!): User!
-    loginUser(data: CreateLoginInput!): AuthPayload!
   }
 
   type User {

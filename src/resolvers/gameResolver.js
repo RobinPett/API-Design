@@ -28,7 +28,7 @@ export const gameResolvers = {
       return await getGameService(container).getGames(filter)
     },
     game: async (_, { id }, { container }) => {
-      return await getGameService(container).getGame({ id })
+      return await getGameService(container).getGame(id)
     }
   },
   Game: {
@@ -51,7 +51,7 @@ export const gameResolvers = {
       return await getGameService(container).deleteGame(id, user)
     }),
     updateGame: withAuth(async (parent, { id, data }, { container, user }) => {
-      return await getGameService(container).updateGame(id, data)
+      return await getGameService(container).updateGame(id, data, user)
     })
   }
 }

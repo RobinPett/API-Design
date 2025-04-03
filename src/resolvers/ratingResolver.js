@@ -13,12 +13,22 @@ export const ratingResolvers = {
     ratings: async (_, filter, { container }) => {
       return await getRatingService(container).getRatings(filter)
     },
-    rating: async (_, gameId, { container }) => {
-      const game = await getGameService(container).getGame(gameId)
-      const ratingId = game.rating.id
-      console.log(ratingId)
+    rating: async (_, { id, gameId }, { container }) => {
+      console.log('RATING id', id)
+      console.log('RATING gameId', gameId)
+
+      if (id && gameId) {
+        throw new Error('You can only use one of id or gameId')
+      }
+
+      if (id) {
+        return await getRatingService(container).getRating(id)
+      } 
       
-      return await getRatingService(container).getRating(ratingId)
+      if (gameId) {
+        const game = await getGameService(container).getGame(gameId)
+        return game.rating
+      }
     }
   }
 }

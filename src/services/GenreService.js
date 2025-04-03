@@ -24,7 +24,7 @@ export class GenreService {
      * Get single genre.
      */
     async getGenre(id) {
-        return await this._repository.getById(id)
+        return await this._repository.getById({ id })
     }
 }
     

@@ -92,6 +92,9 @@ export class MongooseRepositoryBase {
   }
 
   async update (id, data) {
+    console.log('Update ID ' + id)
+    console.log('Update data ' + data)
+
     try {
       await this.#model.updateOne({ id }, data).exec()
       return this.getById({ id })

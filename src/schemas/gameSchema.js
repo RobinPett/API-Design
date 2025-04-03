@@ -20,9 +20,9 @@ export const gameSchema = `
     id: ID!
     title: String!
     release_year: Int!
-    genre: [String]
-    platforms: [String]!
-    rating: String
+    genres: [Genre]
+    platforms: [Platform]!
+    rating: Rating
     developers: [Developer]!
   }  
 
@@ -39,7 +39,7 @@ export const gameSchema = `
   input UpdateGameInput {
     title: String
     release_year: Int
-    genre: [ID]
+    genres: [ID]
     platforms: [ID]
     rating: ID
     developers: [ID]

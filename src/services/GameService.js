@@ -38,7 +38,7 @@ export class GameService {
      * @returns game
      */
     async getGame(id) {
-        return await this._repository.getById(id)
+        return await this._repository.getById({ id })
     }
 
     /**
@@ -47,25 +47,31 @@ export class GameService {
      * @param {object} data
      */
     async addGame(data, user) {
-        this.#authrizeMutation(user) // TODO: Implement authorization
-        console.log('Add game method')
-        const { title, release_year, genre, platforms, rating, developers } = data
+        try {
+            this.#authrizeMutation(user)
+            console.log('Add game method')
+            const { title, release_year, genre, platforms, rating, developers } = data
 
-        // Find genre, platform, rating and developers from respective service based on ID in data
-        const allDevelopers = await this.#fetchResource('developer', developers) // TODO: Enum for developer, platform, genre, rating
-        const allPlatforms = await this.#fetchResource('platform', platforms)
-        const allGenres = await this.#fetchResource('genre', genre)
-        const ratingObject = await this.#fetchResource('rating', rating)
+            // Find genre, platform, rating and developers from respective service based on ID in data
+            const allDevelopers = await this.#fetchResource('developer', developers) // TODO: Enum for developer, platform, genre, rating
+            const allPlatforms = await this.#fetchResource('platform', platforms)
+            const allGenres = await this.#fetchResource('genre', genre)
+            const ratingObject = await this.#fetchResource('rating', rating)
 
-        const newGame = {
-            title,
-            release_year,
-            platforms: allPlatforms,
-            genre: allGenres,
-            rating: ratingObject,
-            developers: allDevelopers
+            const newGame = {
+                title,
+                release_year,
+                platforms: allPlatforms,
+                genre: allGenres,
+                rating: ratingObject,
+                developers: allDevelopers
+            }
+            return await this._repository.create(newGame)
+        } catch (error) {
+            console.error('Error adding game:', error)
+            throw new Error('Failed to add game')
+
         }
-        return await this._repository.create(newGame)
     }
 
     /**
@@ -74,24 +80,40 @@ export class GameService {
      * @param {String} id 
      */
     async deleteGame(id, user) {
-        this.#authrizeMutation(user) // TODO: Implement authorization
-        const game = await this.getGame({ id })
-        
-        // TODO: Check if game exists in seperate method
-        if (!game) {
-            throw new Error('Game not found')
+        try {
+            this.#authrizeMutation(user) // TODO: Implement authorization
+            const game = await this.getGame(id)
+
+            // TODO: Check if game exists in seperate method
+            if (!game) {
+                throw new Error('Game not found')
+            }
+            return await this._repository.delete(id)
+        } catch (error) {
+            console.error('Error deleting game:', error)
+            throw new Error('Failed to delete game')
+
         }
-        return await this._repository.delete(id)
     }
 
     async updateGame(id, data, user) {
-        this.#authrizeMutation(user) // TODO: Implement authorization
-        const game = await this.getGame( {id} )
-        
-        // TODO: Check if game exists in seperate method
-        if (!game) throw new Error('Game not found')
-
-        return await this._repository.update(id, data)
+        try {
+            this.#authrizeMutation(user) // TODO: Implement authorization
+            const game = await this.getGame(id)
+    
+            // TODO: Check if game exists in seperate method
+            if (!game) throw new Error('Game not found')
+    
+            // Extracting the properties from the data object
+            const updatedGameData = await this.#verifyUpdatedData(data)
+    
+            console.log('Updated game data:', updatedGameData)
+    
+            return await this._repository.update(id, updatedGameData)
+        } catch (error) {
+            console.error('Error updating game:', error)
+            throw new Error('Failed to update game')
+        }
     }
 
     async #authrizeMutation(user) {
@@ -100,9 +122,9 @@ export class GameService {
         if (!user) {
             throw new AuthorizationError('Authentication required')
         }
-        
+
         const userFromDb = await this._userService.getUser({ id: user.id })
-        
+
         if (!userFromDb) {
             throw new Error('User not found')
         }
@@ -128,5 +150,23 @@ export class GameService {
             default:
                 throw new Error('Invalid resource type')
         }
+    }
+
+    /**
+     * Verify updated data by fetching resources from respective services.
+     *
+     * @param {object} data 
+     * @returns {object} validData
+     */
+    async #verifyUpdatedData(data) {
+        const { title, release_year, genres, platforms, rating, developers } = data
+
+        const validDevelopers = await this.#fetchResource('developer', developers)
+        const validGenres = await this.#fetchResource('genre', genres)
+        const validPlatforms = await this.#fetchResource('platform', platforms)
+        const validRating = await this.#fetchResource('rating', rating)
+
+        const validData = { title, release_year, genres: validGenres, platforms: validPlatforms, rating: validRating, developers: validDevelopers }
+        return validData
     }
 }
