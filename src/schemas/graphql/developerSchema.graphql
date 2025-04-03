@@ -1,0 +1,10 @@
+type Query {
+    developers(limit: Int): [Developer]
+    developer(id: ID!): Developer
+  }
+
+  type Developer {
+    id: ID!
+    name: String!
+    games: [Game]
+}

@@ -1,0 +1,9 @@
+  type Query {
+    ratings: [Rating]
+    rating(gameId: ID!): Rating
+  }
+
+  type Rating {
+    id: ID!
+    text: String!
+  }
