@@ -8,5 +8,10 @@
         "src": "/(.*)",
         "dest": "src/server.js"
       }
-    ]
+    ],
+    "functions": {
+      "api": {
+        "maxDuration": 30
+      }
+    }
   }
