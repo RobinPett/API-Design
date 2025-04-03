@@ -23,7 +23,7 @@ fastifyApp.setErrorHandler((error, request, reply) => {
 try {
   // Connect to mongoDB
   if (process.env.NODE_ENV !== 'test') {
-    await connectToDatabase(process.env.DB_CONNECTION_STRING)
+    await connectToDatabase(process.env.MONGODB_URI)
   }
   await fastifyApp.listen({ port: process.env.PORT })
   console.log('\x1b[32m%s\x1b[0m', `Graphiql playground running on: http://localhost:${process.env.PORT}/graphiql`)
