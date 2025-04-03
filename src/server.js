@@ -5,7 +5,7 @@ import { fastifyConfig } from './config/fastify.js'
 import { connectToDatabase } from './config/mongoose.js'
 import { AuthorizationError } from './lib/errors/AuthorizationError.js'
 
-const fastifyApp = fastify(fastifyConfig)
+const fastifyApp = fastify()
 
 fastifyApp.register(mercurius, mercuriousConfig)
 
