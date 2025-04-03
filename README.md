@@ -1,15 +1,18 @@
-# Project Title
-Clearly state the name of your API project.
+# Game API
 
 # Implementation type
-Specify your implementation type (REST or GraphQL) 
+GraphQL implementation
 
 # Links 
-- [Production url]
+- [[Production url](https://api-design-theta.vercel.app/)]
 - [Dccumentation url]
 
 ## Description
 Provide a concise summary of what your API does and its main features
+The Game API allows you to query Games along with its Title, Release year, Developers, Genres, Platforms, and Rating.
+To Mutate a game you need to register as a user and login.
+When you have logged in and have a token you can mutate a specific games information.
+
 
 ## Technologies Used
 List the primary technologies and tools utilized in your project for quick reference.
