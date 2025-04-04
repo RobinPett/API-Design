@@ -9,6 +9,7 @@ import { mergeTypeDefs } from '@graphql-tools/merge'
 
 // Errors
 import { AuthorizationError } from '../lib/errors/AuthorizationError.js'
+import { DuplicationError } from '../lib/errors/DuplicationError.js'
 
 // Schemas
 import { gameSchema} from '../schemas/gameSchema.js'
@@ -28,6 +29,7 @@ import { userResolvers } from '../resolvers/userResolver.js'
 
 
 
+
 const typeDefs = mergeTypeDefs([gameSchema, developerSchema, ratingSchema, genreSchema, platformSchema, userSchema])
 const resolvers = [gameResolvers, developerResolvers, ratingResolvers, genreResolvers, platformResolvers, userResolvers]
 
@@ -43,29 +45,42 @@ export const mercuriousConfig = {
     container, 
     user: await authorize(request, reply) 
   }),
-  errorFormatter: (result) => {
-    
-    // Extract original error since Mercurius wraps it in a new error
-    const originalError = result.errors[0]
-
-    console.log('Original error:', originalError)
-    const { message, path } = originalError
-
-    if (originalError instanceof AuthorizationError) {
-      const code = originalError.statusCode || 401
+  // TODO: Move to plugin?
+    errorFormatter: (execution, context) => {
+      const { errors, data } = execution
+      const statusCode = errors.some(e => e.originalError instanceof  DuplicationError || e.code === 'DUPLICATION_ERROR')
+        ? 409
+        : errors.some(e => e.originalError instanceof AuthorizationError || e.code === 'UNAUTHENTICATED') 
+        ? 401 
+        : 400
+  
       return {
-        statusCode: code,
-        response: { errors: [{ message, path }] }
+        statusCode,
+        response: {
+          errors: errors.map(error => ({
+            message: error.message,
+            code: error.originalError.name || error.code || 'INTERNAL_SERVER_ERROR',
+            path: error.path
+          })),
+          data,
+          extensions: {
+            service: 'game-api-service',
+            timestamp: new Date().toISOString()
+          }
+        }
+      }
+    },
+    hooks: {
+      onError: (schema, source, context, errors) => {
+        errors.forEach(error => {
+          fastify.log.error({
+            error: error.originalError,
+            query: context.reply.request.body.query
+          })
+        })
       }
     }
-
-    // Default error handling
-    return {
-      statusCode: 500,
-      response: { errors: [{ message, path }] }
-    }
   }
-}
 
 // TODO: Add error handling for authorization
 // Extract token and authorize user
@@ -83,6 +98,4 @@ function authorize(request, reply) {
   } catch (error) {
     throw new AuthorizationError('Failed to authorize user')
   }
-
-  
 }

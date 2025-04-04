@@ -11,6 +11,7 @@ export const userSchema = `
   }
 
   type User {
+    id: ID!
     email: String!
     username: String!
   }  

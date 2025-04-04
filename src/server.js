@@ -4,6 +4,7 @@ import { mercuriousConfig } from './config/mercurius.js'
 import { fastifyConfig } from './config/fastify.js'
 import { connectToDatabase } from './config/mongoose.js'
 import { AuthorizationError } from './lib/errors/AuthorizationError.js'
+import { DuplicationError } from './lib/errors/DuplicationError.js'
 
 const fastifyApp = fastify(fastifyConfig)
 
@@ -12,7 +13,13 @@ fastifyApp.register(mercurius, mercuriousConfig)
 fastifyApp.setErrorHandler((error, request, reply) => {
   console.log('------------------------ Fastify Error handler -----------------------', error)
 
-  if (error instanceof AuthorizationError) {
+  // if (error instanceof AuthorizationError) {
+  //   reply.status(error.statusCode).send({ error: error.message })
+  // } else {
+  //   reply.code(500).send({ error: error.message })
+  // }
+
+  if (error instanceof DuplicationError) {
     reply.status(error.statusCode).send({ error: error.message })
   } else {
     reply.code(500).send({ error: error.message })

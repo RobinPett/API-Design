@@ -36,9 +36,6 @@ export class UserService {
     async login(data) {
         const user = await this._repository.loginUser(data)
 
-        console.log('-------------------- JWT Service ---------------------')
-        console.log(this._jwtService)
-
         // Generate JWT
         // TODO: Error handling?
         const token = this._jwtService.createJWT(user, process.env.JWT_SECRET, process.env.JWT_EXPIRATION)

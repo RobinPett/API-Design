@@ -5,9 +5,10 @@
  */
 
 import { MongooseRepositoryBase } from "./MongooseRepositoryBase.js"
+import { DuplicationError } from "../lib/errors/DuplicationError.js"
 
 export class UserRepository extends MongooseRepositoryBase {
-    
+
     #model
 
     constructor(model) {
@@ -24,7 +25,9 @@ export class UserRepository extends MongooseRepositoryBase {
     async createUser(data) {
         const { username, email, password } = data
 
-        const user = this.#model.create({
+        console.log('Creating user:', username, email, password)
+
+        const user = this.create({
             email,
             username,
             password

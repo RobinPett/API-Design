@@ -5,6 +5,8 @@
  */
 
 import mongoose from 'mongoose'
+import { DuplicationError } from '../lib/errors/DuplicationError.js'
+import { ValidationError } from '../lib/errors/ValidationError.js'
 
 /**
  * Class representing a Mongoose repository base.
@@ -71,12 +73,24 @@ export class MongooseRepositoryBase {
     }
   }
 
-  async create(item) {
-    console.log('-------------- Create item --------------')
-    console.log(item)
+  /**
+   * Creates a new document in the database.
+   *
+   * @param {object} data 
+   * @returns {Promise<mongoose.Model>}
+   */
+  async create(data) {
     try {
-      return await this.#model.create(item)
+      return await this.#model.create(data)
     } catch (error) {
+      if (error.code === 11000) {
+        throw new DuplicationError('Duplicate key error')
+      }
+
+      if (error.name === 'ValidationError') {
+        throw new ValidationError('Validation error: ' + error.message)
+      }
+
       throw new Error('Failed to create document: ' + error) // TODO: Add custom Repository error
     }
   }
