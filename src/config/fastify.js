@@ -3,5 +3,9 @@
  */
 
 export const fastifyConfig = {
-    logger: true
+    logger: {
+        transport: {
+            target: 'pino-pretty'
+        },
+    }
 }
