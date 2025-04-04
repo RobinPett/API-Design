@@ -5,6 +5,7 @@
  */
 
 import { AuthorizationError } from "../lib/errors/AuthorizationError.js"
+import { NotFoundError } from "../lib/errors/NotFoundError.js"
 
 export class GameService {
     _repository
@@ -53,7 +54,8 @@ export class GameService {
             const { title, release_year, genre, platforms, rating, developers } = data
 
             // Find genre, platform, rating and developers from respective service based on ID in data
-            const allDevelopers = await this.#fetchResource('developer', developers) // TODO: Enum for developer, platform, genre, rating
+            // TODO: Enum for developer, platform, genre, rating
+            const allDevelopers = await this.#fetchResource('developer', developers) 
             const allPlatforms = await this.#fetchResource('platform', platforms)
             const allGenres = await this.#fetchResource('genre', genre)
             const ratingObject = await this.#fetchResource('rating', rating)
@@ -69,8 +71,8 @@ export class GameService {
             return await this._repository.create(newGame)
         } catch (error) {
             console.error('Error adding game:', error)
-            throw new Error('Failed to add game')
-
+            error.message = `${error.message}: Failed to add game`
+            throw error
         }
     }
 
@@ -81,7 +83,7 @@ export class GameService {
      */
     async deleteGame(id, user) {
         try {
-            this.#authrizeMutation(user) // TODO: Implement authorization
+            this.#authrizeMutation(user)
             const game = await this.getGame(id)
 
             // TODO: Check if game exists in seperate method
@@ -91,14 +93,15 @@ export class GameService {
             return await this._repository.delete(id)
         } catch (error) {
             console.error('Error deleting game:', error)
-            throw new Error('Failed to delete game')
+            error.message = `${error.message}: Failed to delete game`
+            throw error
 
         }
     }
 
     async updateGame(id, data, user) {
         try {
-            this.#authrizeMutation(user) // TODO: Implement authorization
+            this.#authrizeMutation(user)
             const game = await this.getGame(id)
     
             // TODO: Check if game exists in seperate method
@@ -112,7 +115,8 @@ export class GameService {
             return await this._repository.update(id, updatedGameData)
         } catch (error) {
             console.error('Error updating game:', error)
-            throw new Error('Failed to update game')
+            error.message = `${error.message}: Failed to update game`
+            throw error
         }
     }
 
@@ -126,7 +130,7 @@ export class GameService {
         const userFromDb = await this._userService.getUser({ id: user.id })
 
         if (!userFromDb) {
-            throw new Error('User not found')
+            throw new NotFoundError('User not found')
         }
     }
 
