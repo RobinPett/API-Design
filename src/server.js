@@ -23,22 +23,25 @@ fastifyApp.get('/', async (request, reply) => {
   reply.send({ message: 'Welcome to the Game GraphQL API' })
 })
 
-// Run server
-try {
-  // Connect to mongoDB
-  if (process.env.NODE_ENV !== 'test') {
+// Connect to mongoDB
+if (process.env.NODE_ENV !== 'test') {
+  try {
     await connectToDatabase(process.env.MONGODB_URI)
+  } catch (error) {
+    console.error('Error connecting to database:', error)
+    process.exit(1)
   }
   
-  // Start server
-  const server = await fastifyApp.listen({port: process.env.PORT})
-  console.log('\x1b[32m%s\x1b[0m', `Graphiql playground running on: ${server}/graphiql`)
-  console.log('\x1b[32m%s\x1b[0m', `Server running at: ${server}`)
-  console.log('Press Ctrl-C to terminate...')
-
-} catch (error) {
-  fastifyApp.log.error(error)
-  process.exit(1)
+}
+  
+// Run server
+export default async function startServer(req, res) {
+  await fastifyApp.ready()
+  app.server.emit('request', req, res)
 }
 
-export default fastifyApp
+
+  // const server = await fastifyApp.listen({port: process.env.PORT})
+  // console.log('\x1b[32m%s\x1b[0m', `Graphiql playground running on: ${server}/graphiql`)
+  // console.log('\x1b[32m%s\x1b[0m', `Server running at: ${server}`)
+  // console.log('Press Ctrl-C to terminate...')
