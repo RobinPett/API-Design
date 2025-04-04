@@ -28,8 +28,6 @@ import { platformResolvers } from '../resolvers/platformResolver.js'
 import { userResolvers } from '../resolvers/userResolver.js'
 
 
-
-
 const typeDefs = mergeTypeDefs([gameSchema, developerSchema, ratingSchema, genreSchema, platformSchema, userSchema])
 const resolvers = [gameResolvers, developerResolvers, ratingResolvers, genreResolvers, platformResolvers, userResolvers]
 

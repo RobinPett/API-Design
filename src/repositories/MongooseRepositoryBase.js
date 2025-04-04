@@ -109,6 +109,7 @@ export class MongooseRepositoryBase {
       this.#model.deleteOne({ id }).exec()
       return { id }
     } catch (error) {
+      if (error instanceof NotFoundError) throw error // Custom error
       throw new RepositoryError('Failed to delete document: ' + error)
     }
   }
@@ -118,6 +119,7 @@ export class MongooseRepositoryBase {
       await this.#model.updateOne({ id }, data).exec()
       return this.getById({ id })
     } catch (error) {
+      if (error instanceof NotFoundError) throw error // Custom error
       throw new RepositoryError('Failed to update document: ' + error)
     }
   }
