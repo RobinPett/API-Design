@@ -4,8 +4,8 @@
 GraphQL implementation
 
 # Links 
-- [[Production url](https://api-design-theta.vercel.app/)]
-- [Dccumentation url](https://documenter.getpostman.com/view/31086079/2sB2cU9h3N)
+- [Production url](https://api-design-theta.vercel.app/)
+- [Documentation url](https://documenter.getpostman.com/view/31086079/2sB2cU9h3N)
 
 ## Description
 Provide a concise summary of what your API does and its main features
