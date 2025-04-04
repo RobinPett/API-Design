@@ -34,14 +34,21 @@ if (process.env.NODE_ENV !== 'test') {
   
 }
   
-// Run server
+// Run server for vercel
 export default async function startServer(req, res) {
   await fastifyApp.ready()
   fastifyApp.server.emit('request', req, res)
 }
 
-
-  // const server = await fastifyApp.listen({port: process.env.PORT})
-  // console.log('\x1b[32m%s\x1b[0m', `Graphiql playground running on: ${server}/graphiql`)
-  // console.log('\x1b[32m%s\x1b[0m', `Server running at: ${server}`)
-  // console.log('Press Ctrl-C to terminate...')
+// Local development server with logging
+if (process.env.NODE_ENV !== 'development') {
+  fastifyApp.listen({port: process.env.PORT}, (error, address) => {
+    if (error) {
+      console.error('Error starting server:', error)
+      process.exit(1)
+    }
+    console.log('\x1b[32m%s\x1b[0m', `Graphiql playground running on: ${address}/graphiql`)
+    console.log('\x1b[32m%s\x1b[0m', `Server running at: ${address}`)
+    console.log('Press Ctrl-C to terminate...')
+  })
+}
