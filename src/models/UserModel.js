@@ -8,6 +8,7 @@ import mongoose from 'mongoose'
 import bcrypt from 'bcrypt'
 import validator from 'validator'
 import { BASE_SCHEMA } from './baseSchema.js'
+import { AuthorizationError } from '../lib/errors/AuthorizationError.js'
 
 const { isEmail } = validator
 
@@ -65,7 +66,7 @@ schema.statics.authenticate = async function (username, password) {
   const user = await this.findOne({ username })
 
   if (!user || !(await bcrypt.compare(password, user.password))) {
-    throw new Error('Invalid login attempt.')
+    throw new AuthorizationError('Invalid login attempt.')
   }
 
   // Return user if found

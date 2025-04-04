@@ -5,8 +5,12 @@
  */
 
 import mongoose from 'mongoose'
+
+// Errors
 import { DuplicationError } from '../lib/errors/DuplicationError.js'
 import { ValidationError } from '../lib/errors/ValidationError.js'
+import { NotFoundError } from '../lib/errors/NotFoundError.js'
+import { RepositoryError } from '../lib/errors/RepositoryError.js'
 
 /**
  * Class representing a Mongoose repository base.
@@ -38,12 +42,16 @@ export class MongooseRepositoryBase {
    */
   async get (filter, projection = null, options = null) {
     try {
-      return await this.#model
+      const documents = await this.#model
         .find(filter, projection, options)
         // .limit(10)
         .exec()
+
+      if (!documents) throw new NotFoundError('Documents not found')
+      return documents
     } catch (error) {
-      throw new Error('Failed to get documents: ' + error ) // TODO: Add custom error
+      if (error instanceof NotFoundError) throw error // Custom error
+      throw new RepositoryError('Failed to get documents: ' + error )
     }
   }
 
@@ -63,13 +71,13 @@ export class MongooseRepositoryBase {
         .exec()
 
         if (!document) {
-          throw new Error('Document not found') // TODO: Add custom Document not found error
+          throw new NotFoundError('Document not found')
         }
 
         return document
     } catch (error) {
-      console.log(error)
-      throw new Error('Failed to get document') // TODO: Add custom Repository error
+      if (error instanceof NotFoundError) throw error // Custom error
+      throw new RepositoryError('Failed to get resource')
     }
   }
 
@@ -97,23 +105,20 @@ export class MongooseRepositoryBase {
 
   async delete (id) {
     try {
-      console.log('Delete ID' + id)
+      this.getById(id) // Check if document exists before deleting
       this.#model.deleteOne({ id }).exec()
       return { id }
     } catch (error) {
-      throw new Error('Failed to delete document: ' + error) // TODO: Add custom Repository error
+      throw new RepositoryError('Failed to delete document: ' + error)
     }
   }
 
   async update (id, data) {
-    console.log('Update ID ' + id)
-    console.log('Update data ' + data)
-
     try {
       await this.#model.updateOne({ id }, data).exec()
       return this.getById({ id })
     } catch (error) {
-      throw new Error('Failed to update document: ' + error) // TODO: Add custom Repository error
+      throw new RepositoryError('Failed to update document: ' + error)
     }
   }
 }
