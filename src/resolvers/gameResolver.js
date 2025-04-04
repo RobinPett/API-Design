@@ -46,14 +46,18 @@ export const gameResolvers = {
   Mutation: {
     addGame: withAuth(async (parent, { data }, { container, user, reply }) => {
       const newGame = await getGameService(container).addGame(data, user)
-      reply.status(201)
+      reply.status(201) // 201 Created
       return newGame
     }),
-    deleteGame: withAuth(async (parent, { id }, { container, user }) => {
-      return await getGameService(container).deleteGame(id, user)
+    deleteGame: withAuth(async (parent, { id }, { container, user, reply }) => {
+      const deleteGame = await getGameService(container).deleteGame(id, user)
+      reply.status(204) // 204 No Content
+      return deleteGame
     }),
-    updateGame: withAuth(async (parent, { id, data }, { container, user }) => {
-      return await getGameService(container).updateGame(id, data, user)
+    updateGame: withAuth(async (parent, { id, data }, { container, user, reply }) => {
+      const updatedGame = await getGameService(container).updateGame(id, data, user)
+      reply.status(200) // 200 OK
+      return updatedGame
     })
   }
 }

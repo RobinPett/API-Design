@@ -54,7 +54,6 @@ export class GameService {
             this.#authrizeMutation(user)
             console.log('Add game method')
             const { title, release_year, genre, platforms, rating, developers } = data
-            console.log(title, release_year, genre, platforms, rating, developers)
 
             // Find genre, platform, rating and developers from respective service based on ID in data
             // TODO: Enum for developer, platform, genre, rating
@@ -89,9 +88,8 @@ export class GameService {
             this.#authrizeMutation(user)
             const game = await this.getGame(id)
 
-            // TODO: Check if game exists in seperate method
             if (!game) {
-                throw new Error('Game not found')
+                throw new NotFoundError('Game not found')
             }
             return await this._repository.delete(id)
         } catch (error) {
@@ -114,9 +112,8 @@ export class GameService {
         try {
             this.#authrizeMutation(user)
             const game = await this.getGame(id)
-    
-            // TODO: Check if game exists in seperate method
-            if (!game) throw new Error('Game not found')
+
+            if (!game) throw new NotFoundError('Game not found')
     
             // Extracting the properties from the data object
             const updatedGameData = await this.#verifyUpdatedData(data)
