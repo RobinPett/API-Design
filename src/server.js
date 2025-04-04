@@ -37,7 +37,7 @@ if (process.env.NODE_ENV !== 'test') {
 // Run server
 export default async function startServer(req, res) {
   await fastifyApp.ready()
-  app.server.emit('request', req, res)
+  fastifyApp.server.emit('request', req, res)
 }
 
 
