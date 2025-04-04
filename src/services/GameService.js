@@ -26,7 +26,9 @@ export class GameService {
 
     /**
      * Get all games.
-     * TODO: Document
+     * 
+     * @param {object} filter - Filter object to filter games
+     * @return {Array} - Array of games
      */
     async getGames(filter) {
         return await this._repository.get(filter)
@@ -100,6 +102,14 @@ export class GameService {
         }
     }
 
+    /**
+     * Update game.
+     * 
+     * @param {String} id
+     * @param {object} data - Game data to update
+     * @param {object} user - User object
+     * @returns {object} - Updated game object 
+     */
     async updateGame(id, data, user) {
         try {
             this.#authrizeMutation(user)
@@ -121,6 +131,11 @@ export class GameService {
         }
     }
 
+    /**
+     * Authorize user for mutation operations.
+     * 
+     * @param {object} user 
+     */
     async #authrizeMutation(user) {
         console.log('Authorizing user:', user)
 
@@ -136,6 +151,13 @@ export class GameService {
     }
 
 
+    /**
+     * Fetch resource based on type and resource ID.
+     *
+     * @param {String} type 
+     * @param {Array} resource 
+     * @returns 
+     */
     async #fetchResource(type, resource) {
         try {
             switch (type) {
