@@ -87,10 +87,6 @@ export class GameService {
         try {
             this.#authrizeMutation(user)
             const game = await this.getGame(id)
-
-            if (!game) {
-                throw new NotFoundError('Game not found')
-            }
             return await this._repository.delete(id)
         } catch (error) {
             console.error('Error deleting game:', error)

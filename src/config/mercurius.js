@@ -47,12 +47,9 @@ export const mercuriousConfig = {
     errorFormatter: (execution, context) => {
       const { errors, data } = execution
       console.error(errors)
-      // const statusCode = errors.some(e => e.originalError.statusCode) || 500
-      const statusCode = errors.some(e => e.originalError instanceof  DuplicationError || e.code === 'DUPLICATION_ERROR')
-        ? 409
-        : errors.some(e => e.originalError instanceof AuthorizationError || e.code === 'UNAUTHENTICATED') 
-        ? 401 
-        : 400
+      
+      // Use statusCode from the first error in the array
+      const statusCode = errors[0]?.originalError?.statusCode || 500
   
       return {
         statusCode,

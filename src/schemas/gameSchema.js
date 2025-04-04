@@ -12,7 +12,7 @@ export const gameSchema = `
 
   type Mutation {
     addGame(data: CreateGameInput!): Game!
-    deleteGame(id: ID!): Game!
+    deleteGame(id: ID!): ID!
     updateGame(id: ID!, data: UpdateGameInput!): Game!
   }
 

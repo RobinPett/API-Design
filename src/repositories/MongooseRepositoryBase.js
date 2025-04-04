@@ -50,7 +50,7 @@ export class MongooseRepositoryBase {
       if (!documents) throw new NotFoundError('Documents not found')
       return documents
     } catch (error) {
-      if (error instanceof NotFoundError) throw error // Custom error
+      if (error instanceof NotFoundError) throw error
       throw new RepositoryError('Failed to get documents: ' + error )
     }
   }
@@ -76,7 +76,7 @@ export class MongooseRepositoryBase {
 
         return document
     } catch (error) {
-      if (error instanceof NotFoundError) throw error // Custom error
+      if (error instanceof NotFoundError) throw error
       throw new RepositoryError('Failed to get resource')
     }
   }
@@ -99,27 +99,40 @@ export class MongooseRepositoryBase {
         throw new ValidationError('Validation error: ' + error.message)
       }
 
-      throw new Error('Failed to create document: ' + error) // TODO: Add custom Repository error
+      throw new RepositoryError('Failed to create document: ' + error)
     }
   }
 
+  /**
+   * Delete a document by id.
+   *
+   * @param {string} id 
+   * @returns {string} The id of the deleted document
+   */
   async delete (id) {
     try {
-      this.getById(id) // Check if document exists before deleting
-      this.#model.deleteOne({ id }).exec()
-      return { id }
+      await this.getById({ id }) // Check if document exists before deleting
+      await this.#model.deleteOne({ id }).exec()
+      return id
     } catch (error) {
-      if (error instanceof NotFoundError) throw error // Custom error
+      if (error instanceof NotFoundError) throw error
       throw new RepositoryError('Failed to delete document: ' + error)
     }
   }
 
+  /**
+   * Update a document by id.
+   * 
+   * @param {string} id 
+   * @param {object} data 
+   * @returns 
+   */
   async update (id, data) {
     try {
       await this.#model.updateOne({ id }, data).exec()
       return this.getById({ id })
     } catch (error) {
-      if (error instanceof NotFoundError) throw error // Custom error
+      if (error instanceof NotFoundError) throw error
       throw new RepositoryError('Failed to update document: ' + error)
     }
   }

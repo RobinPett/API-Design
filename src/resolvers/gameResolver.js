@@ -50,9 +50,9 @@ export const gameResolvers = {
       return newGame
     }),
     deleteGame: withAuth(async (parent, { id }, { container, user, reply }) => {
-      const deleteGame = await getGameService(container).deleteGame(id, user)
+      const deletedGame = await getGameService(container).deleteGame(id, user)
       reply.status(204) // 204 No Content
-      return deleteGame
+      return deletedGame // Id of deleted game - not seen in the response
     }),
     updateGame: withAuth(async (parent, { id, data }, { container, user, reply }) => {
       const updatedGame = await getGameService(container).updateGame(id, data, user)
