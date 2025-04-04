@@ -1,9 +1,0 @@
-  type Query {
-    genres: [Genre]
-    genre(id: ID!): Genre
-  }
-
-  type Genre {
-    id: ID!
-    name: String!
-  }

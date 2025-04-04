@@ -1,9 +1,0 @@
-  type Query {
-    platforms: [Platform]
-    platform(id: ID!): Platform
-  }
-
-  type Platform {
-    id: ID!
-    name: String!
-  }
