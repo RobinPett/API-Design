@@ -24,7 +24,7 @@ export class DeveloperService {
      * Get single developer.
      */
     async getDeveloper(id) {
-        return await this._repository.getById( { id } )
+        return await this._repository.getById({ id })
     }
 }
     

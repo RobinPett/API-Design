@@ -24,7 +24,7 @@ export class PlatformService {
      * Get single genre.
      */
     async getPlatform(id) {
-        return await this._repository.getById(id)
+        return await this._repository.getById({ id })
     }
 }
     

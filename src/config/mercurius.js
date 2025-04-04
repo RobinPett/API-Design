@@ -48,6 +48,8 @@ export const mercuriousConfig = {
   // TODO: Move to plugin?
     errorFormatter: (execution, context) => {
       const { errors, data } = execution
+      console.error(errors)
+      // const statusCode = errors.some(e => e.originalError.statusCode) || 500
       const statusCode = errors.some(e => e.originalError instanceof  DuplicationError || e.code === 'DUPLICATION_ERROR')
         ? 409
         : errors.some(e => e.originalError instanceof AuthorizationError || e.code === 'UNAUTHENTICATED') 
@@ -82,7 +84,7 @@ export const mercuriousConfig = {
     }
   }
 
-// TODO: Add error handling for authorization
+// TODO: Document
 // Extract token and authorize user
 function authorize(request, reply) {
   try {

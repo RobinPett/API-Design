@@ -4,7 +4,9 @@
 GraphQL implementation
 
 # Links 
+- [Github Repo url](https://github.com/RobinPett/API-Design)
 - [Production url](https://api-design-theta.vercel.app/)
+- [Graphql Playground url](https://api-design-theta.vercel.app/graphiql)
 - [Documentation url](https://documenter.getpostman.com/view/31086079/2sB2cU9h3N)
 
 ## Description
@@ -16,6 +18,10 @@ When you have logged in and have a token you can mutate a specific games informa
 
 ## Technologies Used
 List the primary technologies and tools utilized in your project for quick reference.
+
+The API is built with Javascript using the Fastify framework together with Mercurius to adapt GraphQL functionality.
+The database is mongoDB, in production MongoDB Atlas is used. 
+The API is in production on Vercel. 
 
 ## Installation Instructions
    - **Steps:**

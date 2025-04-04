@@ -12,7 +12,7 @@ export const genreResolvers = {
     genres: async (_, filter, { container }) => {
       return await getGenreService(container).getGenres(filter)
     },
-    genre: async (_, id, { container }) => {
+    genre: async (_, { id }, { container }) => {
       return await getGenreService(container).getGenre(id)
     }
   }

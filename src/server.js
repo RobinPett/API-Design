@@ -11,21 +11,17 @@ const fastifyApp = fastify(fastifyConfig)
 fastifyApp.register(mercurius, mercuriousConfig)
 
 fastifyApp.setErrorHandler((error, request, reply) => {
-  console.log('------------------------ Fastify Error handler -----------------------', error)
+  console.log('Fastify Error handler')
+  console.error(error)
 
-  // if (error instanceof AuthorizationError) {
-  //   reply.status(error.statusCode).send({ error: error.message })
-  // } else {
-  //   reply.code(500).send({ error: error.message })
-  // }
-
-  if (error instanceof DuplicationError) {
+  if (error.statusCode) {
     reply.status(error.statusCode).send({ error: error.message })
   } else {
     reply.code(500).send({ error: error.message })
   }
 })
 
+// Add information message in root route
 fastifyApp.get('/', async (request, reply) => {
   reply.send({ message: 'Welcome to the Game GraphQL API! Send queries to /graphql or user /graphiql to access the playground' })
 })

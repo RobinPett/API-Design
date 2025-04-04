@@ -11,7 +11,7 @@ export const platformResolvers = {
     platforms: async (_, filter, { container }) => {
       return await getPlatformService(container).getPlatforms(filter)
     },
-    platform: async (_, id, { container }) => {
+    platform: async (_, { id }, { container }) => {
       return await getPlatformService(container).getPlatform(id)
     }
   }

@@ -52,6 +52,7 @@ export class GameService {
             this.#authrizeMutation(user)
             console.log('Add game method')
             const { title, release_year, genre, platforms, rating, developers } = data
+            console.log(title, release_year, genre, platforms, rating, developers)
 
             // Find genre, platform, rating and developers from respective service based on ID in data
             // TODO: Enum for developer, platform, genre, rating
@@ -136,24 +137,31 @@ export class GameService {
 
 
     async #fetchResource(type, resource) {
-        switch (type) {
-            case 'developer':
-                return await Promise.all(resource.map((developerId) => {
-                    return this._developerService.getDeveloper(developerId)
-                }))
-            case 'platform':
-                return await Promise.all(resource.map((platformId) => {
-                    return this._platformService.getPlatform(platformId)
-                }))
-            case 'genre':
-                return await Promise.all(resource.map((genreId) => {
-                    return this._genreService.getGenre(genreId)
-                }))
-            case 'rating':
-                return await this._ratingService.getRating(resource)
-            default:
-                throw new Error('Invalid resource type')
+        try {
+            switch (type) {
+                case 'developer':
+                    return await Promise.all(resource.map((developerId) => {
+                        return this._developerService.getDeveloper(developerId)
+                    }))
+                case 'platform':
+                    return await Promise.all(resource.map((platformId) => {
+                        return this._platformService.getPlatform(platformId)
+                    }))
+                case 'genre':
+                    return await Promise.all(resource.map((genreId) => {
+                        return this._genreService.getGenre(genreId)
+                    }))
+                case 'rating':
+                    return await this._ratingService.getRating(resource)
+                default:
+                    throw new Error('Invalid resource type')
+            }
+        } catch (error) {
+            console.error('Error fetching resource:', error)
+            error.message = `${error.message}: Failed to fetch ${type} to create game`
+            throw error
         }
+
     }
 
     /**
