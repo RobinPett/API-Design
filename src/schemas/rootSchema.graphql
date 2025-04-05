@@ -1,3 +1,7 @@
+## This file contains the root schema for the Game GraphQL API.
+## This is used to import the schema into Postman for testing and documentation.
+## Not used in the codebase.
+
 type Query {
     developers(limit: Int): [Developer]
     developer(id: ID!): Developer
