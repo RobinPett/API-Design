@@ -3,13 +3,26 @@ import mercurius from 'mercurius'
 import { mercuriousConfig } from './config/mercurius.js'
 import { fastifyConfig } from './config/fastify.js'
 import { connectToDatabase } from './config/mongoose.js'
-import { AuthorizationError } from './lib/errors/AuthorizationError.js'
-import { DuplicationError } from './lib/errors/DuplicationError.js'
+import fastifyHelmet from '@fastify/helmet'
+import fastifyRateLimit from '@fastify/rate-limit'
 
 const fastifyApp = fastify(fastifyConfig)
 
+// Register mercurius for GraphQL adaptation
 fastifyApp.register(mercurius, mercuriousConfig)
 
+// Register helmet for security headers
+fastifyApp.register(fastifyHelmet, {
+  contentSecurityPolicy: false
+})
+
+// Register rate limiting
+fastifyApp.register(fastifyRateLimit, {
+  max: 100,
+  timeWindow: '1 minute',
+})
+
+// Error handling
 fastifyApp.setErrorHandler((error, request, reply) => {
   console.log('Fastify Error handler')
   console.error(error)
@@ -43,7 +56,7 @@ export default async function startServer(req, res) {
   fastifyApp.server.emit('request', req, res)
 }
 
-// Local development server with logging
+// Local development server
 if (process.env.NODE_ENV !== 'development') {
   fastifyApp.listen({port: process.env.PORT}, (error, address) => {
     if (error) {

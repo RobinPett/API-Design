@@ -36,6 +36,6 @@ The API is in production on Vercel.
      - **Start server:** Use `npm run dev` to run the server locally.
 
    - **Testing with Postman:**
-     - **Import the Collection:** Guide on how to import the provided Postman collection.
+     - **Import the Collection:** Go to Postman and import this collection - [Game API Collection](./Game%20API.postman_collection.json)
      - **Set Up Environment Variables:** Instructions to configure environment variables within Postman.
      - **Run the Tests:** Steps to execute the tests using Postman or Newman for automation.
