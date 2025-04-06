@@ -1,0 +1,3106 @@
+{
+	"info": {
+		"_postman_id": "0cc8ed69-2f48-4173-8cee-db7ea70c7efa",
+		"name": "Game API",
+		"description": "A GraphQL API to do CRUD operations on videogames.\n\n**Query** games, developers, platforms, genres and ratings\n\n**Mutate** a game by creating, updating or deleting one.\n\n**Authenticate** mutations with a JWT token recieved after a successful sign in.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "31086079",
+		"_collection_link": "https://api-design-0319.postman.co/workspace/68c4a07a-5b89-425f-8e05-f6bd3e079167/collection/31086079-0cc8ed69-2f48-4173-8cee-db7ea70c7efa?action=share&source=collection_link&creator=31086079"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register user",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Tests for creating a new user\r",
+									"\r",
+									"let currentUsername = pm.collectionVariables.get(\"newUsername\") || \"tester\"\r",
+									"\r",
+									"// Use a regular expression to check if the current username ends with a number\r",
+									"let numberPattern = /\\d+$/\r",
+									"let match = currentUsername.match(numberPattern)\r",
+									"\r",
+									"// Determine the next number to append. If no number exists, start from 1.\r",
+									"let newNumber = match ? parseInt(match[0]) + 1 : 1\r",
+									"\r",
+									"let adjustedUsername = currentUsername.replace(numberPattern, '') + newNumber\r",
+									"\r",
+									"let adjustedUserEmail = adjustedUsername + \"@test.com\"\r",
+									"\r",
+									"pm.collectionVariables.set('newUsername', adjustedUsername)\r",
+									"pm.collectionVariables.set('newUserEmail', adjustedUserEmail)"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201 when registering with correct credentials\", function () {\r",
+									"  pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"let response = pm.response.json();\r",
+									"\r",
+									"pm.collectionVariables.set('newUserId', response.data.registerUser.id);\r",
+									"\r",
+									"// Add new user details to existing user variables\r",
+									"let newUsername = pm.collectionVariables.get(\"newUsername\")\r",
+									"let newUserPassword = pm.collectionVariables.get(\"newUserPassword\")\r",
+									"\r",
+									"pm.collectionVariables.set('existingUsername', newUsername)\r",
+									"pm.collectionVariables.set('existingUserPassword', newUserPassword)"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation {\r\n    registerUser(data: {\r\n        email: \"{{newUserEmail}}\"\r\n        username: \"{{newUsername}}\"\r\n        password: \"{{newUserPassword}}\"\r\n    }) {\r\n        id\r\n    }\r\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}",
+							"host": [
+								"{{baseUrl}}"
+							]
+						},
+						"description": "Register a user with **email, username** and **password.**\n\nReturns **id** and **username**"
+					},
+					"response": [
+						{
+							"name": "Register user",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation {\r\n    registerUser(data: {\r\n        email: \"newusername@test.com\"\r\n        username: \"newusername\"\r\n        password: \"newUserPassword123\"\r\n    }) {\r\n        id\r\n    }\r\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "https://api-design-theta.vercel.app/graphql",
+									"protocol": "https",
+									"host": [
+										"api-design-theta",
+										"vercel",
+										"app"
+									],
+									"path": [
+										"graphql"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Cache-Control",
+									"value": "public, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Content-Length",
+									"value": "59"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 06 Apr 2025 07:41:43 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Vercel"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=63072000; includeSubDomains; preload"
+								},
+								{
+									"key": "X-Vercel-Cache",
+									"value": "MISS"
+								},
+								{
+									"key": "X-Vercel-Id",
+									"value": "arn1::arn1::g96f8-1743925303458-866a18d9fb3e"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"registerUser\": {\n            \"id\": \"67f2303766c896a6a381a01a\"\n        }\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Register existing user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 409 when registering with credentials of an existing user\", function () {\r",
+									"  pm.response.to.have.status(409);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation {\r\n    registerUser(data: {\r\n        email: \"{{existingUserEmail}}\"\r\n        username: \"{{existingUsername}}\"\r\n        password: \"{{existingUserPassword}}\"\r\n    }) {\r\n        id\r\n    }\r\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}",
+							"host": [
+								"{{baseUrl}}"
+							]
+						},
+						"description": "Example of what happens if you try to register an exisiting user"
+					},
+					"response": [
+						{
+							"name": "Register existing user",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation {\r\n    registerUser(data: {\r\n        email: \"existinguser@test.com\"\r\n        username: \"existinguser\"\r\n        password: \"{{existingUserpPassword}}\"\r\n    }) {\r\n        id\r\n        username\r\n    }\r\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "https://api-design-theta.vercel.app/graphql",
+									"protocol": "https",
+									"host": [
+										"api-design-theta",
+										"vercel",
+										"app"
+									],
+									"path": [
+										"graphql"
+									]
+								}
+							},
+							"status": "Conflict",
+							"code": 409,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Cache-Control",
+									"value": "public, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Content-Length",
+									"value": "108"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 05 Apr 2025 07:52:58 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Vercel"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=63072000; includeSubDomains; preload"
+								},
+								{
+									"key": "X-Vercel-Cache",
+									"value": "MISS"
+								},
+								{
+									"key": "X-Vercel-Id",
+									"value": "arn1::arn1::h8dlh-1743839578566-494c3c3fd5ff"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"errors\": [\n        {\n            \"message\": \"Duplicate key error\",\n            \"code\": \"DuplicationError\",\n            \"path\": [\n                \"registerUser\"\n            ]\n        }\n    ],\n    \"data\": null\n}"
+						}
+					]
+				},
+				{
+					"name": "Login user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 when logging in with correct credentials\", function () {\r",
+									"  pm.response.to.have.status(200)\r",
+									"})\r",
+									"\r",
+									"var jsonData = pm.response.json()\r",
+									"\r",
+									"let token = jsonData.data.loginUser.token\r",
+									"\r",
+									"let tokenParts = token.split('.')\r",
+									"\r",
+									"pm.test(\"JWT token is in correct format\", function () {\r",
+									"    pm.expect(tokenParts.length).to.eql(3)\r",
+									"})\r",
+									"\r",
+									"pm.collectionVariables.set(\"token\", token)\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation {\r\n    loginUser(data: {\r\n        username: \"{{existingUsername}}\"\r\n        password: \"{{existingUserPassword}}\"\r\n    }) {\r\n        token\r\n    }\r\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}",
+							"host": [
+								"{{baseUrl}}"
+							]
+						},
+						"description": "Logging in with existing user credentials **username** and **password**\n\n**Authentication** recieved as a _JWT token_ via the **token** field"
+					},
+					"response": [
+						{
+							"name": "Login user",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation {\r\n    loginUser(data: {\r\n        username: \"existinguser\"\r\n        password: \"existingpassword123\"\r\n    }) {\r\n        token\r\n    }\r\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "https://api-design-theta.vercel.app/graphql",
+									"protocol": "https",
+									"host": [
+										"api-design-theta",
+										"vercel",
+										"app"
+									],
+									"path": [
+										"graphql"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Cache-Control",
+									"value": "public, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Content-Length",
+									"value": "271"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 06 Apr 2025 08:23:32 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Vercel"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=63072000; includeSubDomains; preload"
+								},
+								{
+									"key": "X-Vercel-Cache",
+									"value": "MISS"
+								},
+								{
+									"key": "X-Vercel-Id",
+									"value": "arn1::arn1::w478m-1743927812728-eed5c41aebf0"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"loginUser\": {\n            \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2N2YyMzEzNDY2Yzg5NmE2YTM4MWEwMWMiLCJ1c2VybmFtZSI6InRlc3RlcjIiLCJlbWFpbCI6InRlc3RlcjJAdGVzdC5jb20iLCJpYXQiOjE3NDM5Mjc4MTIsImV4cCI6MTc0MzkzMTQxMn0.Cv_G78KEeEeuBbxfkJG5pjuWO2JXPpuxhLfwRk6kLhM\"\n        }\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Login user - Wrong credentials",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 401 when logging in with wrong credentials\", function () {\r",
+									"  pm.response.to.have.status(401)\r",
+									"})\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation {\r\n    loginUser(data: {\r\n        username: \"{{wrongUsername}}\"\r\n        password: \"{{wrongUserPassword}}\"\r\n    }) {\r\n        token\r\n    }\r\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}",
+							"host": [
+								"{{baseUrl}}"
+							]
+						},
+						"description": "Example of request with wrong username and password"
+					},
+					"response": [
+						{
+							"name": "Login user - Wrong credentials",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation {\r\n    loginUser(data: {\r\n        username: \"wrongusername\"\r\n        password: \"wrongpassword\"\r\n    }) {\r\n        token\r\n    }\r\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "https://api-design-theta.vercel.app/graphql",
+									"protocol": "https",
+									"host": [
+										"api-design-theta",
+										"vercel",
+										"app"
+									],
+									"path": [
+										"graphql"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Cache-Control",
+									"value": "public, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Content-Length",
+									"value": "110"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 06 Apr 2025 08:23:49 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Vercel"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=63072000; includeSubDomains; preload"
+								},
+								{
+									"key": "X-Vercel-Cache",
+									"value": "MISS"
+								},
+								{
+									"key": "X-Vercel-Id",
+									"value": "arn1::arn1::vqwx5-1743927829214-f0f7d782db62"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"errors\": [\n        {\n            \"message\": \"Invalid login attempt.\",\n            \"code\": \"AuthorizationError\",\n            \"path\": [\n                \"loginUser\"\n            ]\n        }\n    ],\n    \"data\": null\n}"
+						}
+					]
+				}
+			],
+			"description": "**Register** and **Sign in** as a user of the API\n\nA **JWT Token** is recieved on a successful sign in."
+		},
+		{
+			"name": "Games",
+			"item": [
+				{
+					"name": "Get games",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 when fetching games\", function () {\r",
+									"  pm.response.to.have.status(200)\r",
+									"});\r",
+									"\r",
+									"let response = pm.response.json()\r",
+									"let games = response.data.games\r",
+									"\r",
+									"pm.test(\"Response contains the expected game structure\", function () {\r",
+									"    pm.expect(games).to.be.an('array')\r",
+									"    games.forEach(game => {\r",
+									"        pm.expect(game).to.have.property('id')\r",
+									"        pm.expect(game).to.have.property('title')\r",
+									"        pm.expect(game).to.have.property('release_year')\r",
+									"        pm.expect(game).to.have.property('platforms')\r",
+									"        pm.expect(game).to.have.property('genres')\r",
+									"        pm.expect(game).to.have.property('rating')\r",
+									"        pm.expect(game).to.have.property('developers')\r",
+									"    })\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query {\r\n    games(release_year: 1998, limit: 5) {\r\n        id\r\n        title\r\n        release_year\r\n        platforms {\r\n            id\r\n            name\r\n        }\r\n        genres {\r\n            id\r\n            name\r\n        }\r\n        rating {\r\n            id\r\n            text\r\n        }\r\n        developers {\r\n            id\r\n            name\r\n        }\r\n    }\r\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}",
+							"host": [
+								"{{baseUrl}}"
+							]
+						},
+						"description": "Get all **games**\n\n_Options_:\n\n- release_year: Filter based on year released\n    \n- limit: Limit the number of results with a positive number"
+					},
+					"response": [
+						{
+							"name": "Get games",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query {\r\n    games(release_year: 1998, limit: 5) {\r\n        id\r\n        title\r\n        release_year\r\n        platforms {\r\n            id\r\n            name\r\n        }\r\n        genres {\r\n            id\r\n            name\r\n        }\r\n        rating {\r\n            id\r\n            text\r\n        }\r\n        developers {\r\n            id\r\n            name\r\n        }\r\n    }\r\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "https://api-design-theta.vercel.app/graphql",
+									"protocol": "https",
+									"host": [
+										"api-design-theta",
+										"vercel",
+										"app"
+									],
+									"path": [
+										"graphql"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Cache-Control",
+									"value": "public, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Content-Encoding",
+									"value": "br"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 06 Apr 2025 21:01:02 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Vercel"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=63072000; includeSubDomains; preload"
+								},
+								{
+									"key": "X-Vercel-Cache",
+									"value": "MISS"
+								},
+								{
+									"key": "X-Vercel-Id",
+									"value": "arn1::arn1::bdm6q-1743973262113-adeb52203fb0"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"games\": [\n            {\n                \"id\": \"game_523\",\n                \"title\": \"Thief Gold\",\n                \"release_year\": 1998,\n                \"platforms\": [\n                    {\n                        \"id\": \"platform_1\",\n                        \"name\": \"PC\"\n                    }\n                ],\n                \"genres\": null,\n                \"rating\": {\n                    \"id\": \"rating_4\",\n                    \"text\": \"Mature\"\n                },\n                \"developers\": [\n                    {\n                        \"id\": \"dev_540\",\n                        \"name\": \"Looking Glass Studios\"\n                    }\n                ]\n            },\n            {\n                \"id\": \"game_4646\",\n                \"title\": \"Turok 2: Seeds of Evil\",\n                \"release_year\": 1998,\n                \"platforms\": [\n                    {\n                        \"id\": \"platform_5\",\n                        \"name\": \"Nintendo Switch\"\n                    },\n                    {\n                        \"id\": \"platform_1\",\n                        \"name\": \"PC\"\n                    },\n                    {\n                        \"id\": \"platform_3\",\n                        \"name\": \"Xbox One\"\n                    },\n                    {\n                        \"id\": \"platform_20\",\n                        \"name\": \"Nintendo 64\"\n                    }\n                ],\n                \"genres\": null,\n                \"rating\": {\n                    \"id\": \"rating_3\",\n                    \"text\": \"Teen\"\n                },\n                \"developers\": [\n                    {\n                        \"id\": \"dev_4396\",\n                        \"name\": \"Nightdive Studios\"\n                    },\n                    {\n                        \"id\": \"dev_4397\",\n                        \"name\": \"Acclaim Studios Austin\"\n                    },\n                    {\n                        \"id\": \"dev_4398\",\n                        \"name\": \"Iguana Entertainment\"\n                    }\n                ]\n            },\n            {\n                \"id\": \"game_8604\",\n                \"title\": \"Battlezone 98 Redux\",\n                \"release_year\": 1998,\n                \"platforms\": [\n                    {\n                        \"id\": \"platform_1\",\n                        \"name\": \"PC\"\n                    },\n                    {\n                        \"id\": \"platform_2\",\n                        \"name\": \"macOS\"\n                    }\n                ],\n                \"genres\": null,\n                \"rating\": null,\n                \"developers\": [\n                    {\n                        \"id\": \"dev_7654\",\n                        \"name\": \"Big Boat Interactive\"\n                    }\n                ]\n            },\n            {\n                \"id\": \"game_38633\",\n                \"title\": \"Pajama Sam 2: Thunder and Lightning Aren't So Frightening\",\n                \"release_year\": 1998,\n                \"platforms\": [\n                    {\n                        \"id\": \"platform_9\",\n                        \"name\": \"Android\"\n                    },\n                    {\n                        \"id\": \"platform_6\",\n                        \"name\": \"iOS\"\n                    },\n                    {\n                        \"id\": \"platform_8\",\n                        \"name\": \"Linux\"\n                    },\n                    {\n                        \"id\": \"platform_2\",\n                        \"name\": \"macOS\"\n                    },\n                    {\n                        \"id\": \"platform_1\",\n                        \"name\": \"PC\"\n                    }\n                ],\n                \"genres\": null,\n                \"rating\": null,\n                \"developers\": [\n                    {\n                        \"id\": \"dev_23610\",\n                        \"name\": \"Humongous Entertainment\"\n                    }\n                ]\n            },\n            {\n                \"id\": \"game_57970\",\n                \"title\": \"Return to Krondor\",\n                \"release_year\": 1998,\n                \"platforms\": [\n                    {\n                        \"id\": \"platform_1\",\n                        \"name\": \"PC\"\n                    }\n                ],\n                \"genres\": null,\n                \"rating\": {\n                    \"id\": \"rating_3\",\n                    \"text\": \"Teen\"\n                },\n                \"developers\": [\n                    {\n                        \"id\": \"dev_38689\",\n                        \"name\": \"PyroTechnix\"\n                    }\n                ]\n            }\n        ]\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get games - Invalid parameters",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400 when fetching games with invalid parameters\", function () {\r",
+									"  pm.response.to.have.status(400)\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query {\r\n    games(id: \"{{wrongGameId}}\") {\r\n        id\r\n        title\r\n    }\r\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}",
+							"host": [
+								"{{baseUrl}}"
+							]
+						},
+						"description": "Example of query with wrong parameter"
+					},
+					"response": [
+						{
+							"name": "Get games - Invalid parameters",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query {\r\n    games(id: \"wrongGame_1\") {\r\n        id\r\n        title\r\n    }\r\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "https://api-design-theta.vercel.app/graphql",
+									"protocol": "https",
+									"host": [
+										"api-design-theta",
+										"vercel",
+										"app"
+									],
+									"path": [
+										"graphql"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Cache-Control",
+									"value": "public, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Content-Length",
+									"value": "156"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 06 Apr 2025 08:36:45 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Vercel"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=63072000; includeSubDomains; preload"
+								},
+								{
+									"key": "X-Vercel-Cache",
+									"value": "MISS"
+								},
+								{
+									"key": "X-Vercel-Id",
+									"value": "arn1::arn1::jwxhz-1743928605945-e0379f8c4833"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"errors\": [\n        {\n            \"message\": \"Graphql validation error\",\n            \"code\": \"FastifyError\"\n        }\n    ],\n    \"extensions\": {\n        \"service\": \"game-api-service\",\n        \"timestamp\": \"2025-04-06T08:36:45.982Z\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get a game",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 when fetching a single game\", function () {\r",
+									"  pm.response.to.have.status(200)\r",
+									"});\r",
+									"\r",
+									"let response = pm.response.json()\r",
+									"let game = response.data.game\r",
+									"\r",
+									"pm.test(\"Response contains the expected game structure\", function () {\r",
+									"        pm.expect(game).to.have.property('id')\r",
+									"        pm.expect(game).to.have.property('title')\r",
+									"        pm.expect(game).to.have.property('release_year')\r",
+									"        pm.expect(game).to.have.property('platforms')\r",
+									"        pm.expect(game).to.have.property('genres')\r",
+									"        pm.expect(game).to.have.property('rating')\r",
+									"        pm.expect(game).to.have.property('developers')\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query {\r\n    game(id: \"{{gameId}}\") {\r\n        id\r\n        title\r\n        release_year\r\n        platforms {\r\n            name\r\n        }\r\n        genres {\r\n            name\r\n        }\r\n        rating {\r\n            text\r\n        }\r\n        developers {\r\n            id\r\n            name\r\n        }\r\n    }\r\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}",
+							"host": [
+								"{{baseUrl}}"
+							]
+						},
+						"description": "Query of a **single game** based in its **id**"
+					},
+					"response": [
+						{
+							"name": "Get a game",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query {\r\n    game(id: \"game_1\") {\r\n        id\r\n        title\r\n        release_year\r\n        platforms {\r\n            name\r\n        }\r\n        genres {\r\n            name\r\n        }\r\n        rating {\r\n            text\r\n        }\r\n        developers {\r\n            id\r\n            name\r\n        }\r\n    }\r\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "https://api-design-theta.vercel.app/graphql",
+									"protocol": "https",
+									"host": [
+										"api-design-theta",
+										"vercel",
+										"app"
+									],
+									"path": [
+										"graphql"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Cache-Control",
+									"value": "public, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Content-Length",
+									"value": "302"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 06 Apr 2025 08:37:47 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Vercel"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=63072000; includeSubDomains; preload"
+								},
+								{
+									"key": "X-Vercel-Cache",
+									"value": "MISS"
+								},
+								{
+									"key": "X-Vercel-Id",
+									"value": "arn1::arn1::4mxkw-1743928667521-f58a072350f4"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"game\": {\n            \"id\": \"game_1\",\n            \"title\": \"D/Generation HD\",\n            \"release_year\": 2015,\n            \"platforms\": [\n                {\n                    \"name\": \"PC\"\n                },\n                {\n                    \"name\": \"macOS\"\n                },\n                {\n                    \"name\": \"Xbox One\"\n                },\n                {\n                    \"name\": \"PlayStation 4\"\n                },\n                {\n                    \"name\": \"Nintendo Switch\"\n                }\n            ],\n            \"genres\": null,\n            \"rating\": {\n                \"text\": \"Everyone 10+\"\n            },\n            \"developers\": [\n                {\n                    \"id\": \"dev_1\",\n                    \"name\": \"West Coast Software\"\n                }\n            ]\n        }\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get a game - Wrong ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404 when fetching a single game with wrong id\", function () {\r",
+									"  pm.response.to.have.status(404)\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query {\r\n    game(id: \"{{wrongGameId}}\") {\r\n        id\r\n    }\r\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}",
+							"host": [
+								"{{baseUrl}}"
+							]
+						},
+						"description": "Example of query of a game using a wrong game **id**"
+					},
+					"response": [
+						{
+							"name": "Get a game - Wrong ID",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query {\r\n    game(id: \"wrongGame_1\") {\r\n        id\r\n        title\r\n    }\r\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "https://api-design-theta.vercel.app/graphql",
+									"protocol": "https",
+									"host": [
+										"api-design-theta",
+										"vercel",
+										"app"
+									],
+									"path": [
+										"graphql"
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Cache-Control",
+									"value": "public, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Content-Length",
+									"value": "107"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 06 Apr 2025 08:37:58 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Vercel"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=63072000; includeSubDomains; preload"
+								},
+								{
+									"key": "X-Vercel-Cache",
+									"value": "MISS"
+								},
+								{
+									"key": "X-Vercel-Id",
+									"value": "arn1::arn1::zk7ql-1743928678852-adf53d73bea6"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"errors\": [\n        {\n            \"message\": \"Document not found\",\n            \"code\": \"RepositoryError\",\n            \"path\": [\n                \"game\"\n            ]\n        }\n    ],\n    \"data\": {\n        \"game\": null\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get a game with nested fields",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 when fetching a single developer with nested fields\", function () {\r",
+									"  pm.response.to.have.status(200)\r",
+									"});\r",
+									"\r",
+									"let response = pm.response.json()\r",
+									"let game = response.data.game\r",
+									"\r",
+									"pm.test(\"Response contains game with developers\", function () {\r",
+									"    let developers = game.developers\r",
+									"    pm.expect(developers).to.be.an('array')\r",
+									"    \r",
+									"    developers.forEach(developer => {\r",
+									"        pm.expect(developer).to.have.property('id')\r",
+									"        pm.expect(developer).to.have.property('name')\r",
+									"        pm.expect(developer).to.have.property('games')\r",
+									"    })\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Response contains nested games with correct structure\", function () {\r",
+									"    let developers = game.developers\r",
+									"    developers.forEach(developer => {\r",
+									"        let games = developer.games\r",
+									"\r",
+									"        games.forEach(game => {\r",
+									"            pm.expect(game).to.have.property('id')\r",
+									"            pm.expect(game).to.have.property('title')\r",
+									"            pm.expect(game).to.have.property('release_year')\r",
+									"            pm.expect(game).to.have.property('platforms')\r",
+									"            pm.expect(game).to.have.property('genres')\r",
+									"            pm.expect(game).to.have.property('rating')\r",
+									"            pm.expect(game).to.have.property('developers')\r",
+									"        })\r",
+									"    })\r",
+									"})\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query {\r\n    game(id: \"game_1\") {\r\n        id\r\n        title\r\n        developers {\r\n            id\r\n            name\r\n            games {\r\n                id\r\n                title\r\n                release_year\r\n                platforms {\r\n                    name\r\n                }\r\n                genres {\r\n                    name\r\n                }\r\n                rating {\r\n                    text\r\n                }\r\n                developers {\r\n                    id\r\n                    name\r\n                }\r\n            }\r\n        }\r\n    }\r\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}",
+							"host": [
+								"{{baseUrl}}"
+							]
+						},
+						"description": "Query of a **game** with its **developers** and their **games.**"
+					},
+					"response": [
+						{
+							"name": "Get a game with nested fields",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query {\r\n    game(id: \"game_1\") {\r\n        id\r\n        title\r\n        developers {\r\n            id\r\n            name\r\n            games {\r\n                id\r\n                title\r\n                release_year\r\n                platforms {\r\n                    name\r\n                }\r\n                genres {\r\n                    name\r\n                }\r\n                rating {\r\n                    text\r\n                }\r\n                developers {\r\n                    id\r\n                    name\r\n                }\r\n            }\r\n        }\r\n    }\r\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "https://api-design-theta.vercel.app/graphql",
+									"protocol": "https",
+									"host": [
+										"api-design-theta",
+										"vercel",
+										"app"
+									],
+									"path": [
+										"graphql"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Cache-Control",
+									"value": "public, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Content-Encoding",
+									"value": "br"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 06 Apr 2025 22:03:18 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Vercel"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=63072000; includeSubDomains; preload"
+								},
+								{
+									"key": "X-Vercel-Cache",
+									"value": "MISS"
+								},
+								{
+									"key": "X-Vercel-Id",
+									"value": "arn1::arn1::m7h45-1743976998414-8e6efb8e8c71"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"game\": {\n            \"id\": \"game_1\",\n            \"title\": \"D/Generation HD\",\n            \"developers\": [\n                {\n                    \"id\": \"dev_1\",\n                    \"name\": \"West Coast Software\",\n                    \"games\": [\n                        {\n                            \"id\": \"game_1\",\n                            \"title\": \"D/Generation HD\",\n                            \"release_year\": 2015,\n                            \"platforms\": [\n                                {\n                                    \"name\": \"PC\"\n                                },\n                                {\n                                    \"name\": \"macOS\"\n                                },\n                                {\n                                    \"name\": \"Xbox One\"\n                                },\n                                {\n                                    \"name\": \"PlayStation 4\"\n                                },\n                                {\n                                    \"name\": \"Nintendo Switch\"\n                                }\n                            ],\n                            \"genres\": null,\n                            \"rating\": {\n                                \"text\": \"Everyone 10+\"\n                            },\n                            \"developers\": [\n                                {\n                                    \"id\": \"dev_1\",\n                                    \"name\": \"West Coast Software\"\n                                }\n                            ]\n                        },\n                        {\n                            \"id\": \"game_438317\",\n                            \"title\": \"Splat the Fruit\",\n                            \"release_year\": 2018,\n                            \"platforms\": [\n                                {\n                                    \"name\": \"Nintendo Switch\"\n                                }\n                            ],\n                            \"genres\": null,\n                            \"rating\": null,\n                            \"developers\": [\n                                {\n                                    \"id\": \"dev_1\",\n                                    \"name\": \"West Coast Software\"\n                                }\n                            ]\n                        },\n                        {\n                            \"id\": \"game_438813\",\n                            \"title\": \"D/Generation: The Original\",\n                            \"release_year\": 2018,\n                            \"platforms\": [\n                                {\n                                    \"name\": \"Nintendo Switch\"\n                                }\n                            ],\n                            \"genres\": null,\n                            \"rating\": null,\n                            \"developers\": [\n                                {\n                                    \"id\": \"dev_1\",\n                                    \"name\": \"West Coast Software\"\n                                }\n                            ]\n                        },\n                        {\n                            \"id\": \"game_447921\",\n                            \"title\": \"D/Generation\",\n                            \"release_year\": 2015,\n                            \"platforms\": [\n                                {\n                                    \"name\": \"iOS\"\n                                }\n                            ],\n                            \"genres\": null,\n                            \"rating\": {\n                                \"text\": \"Everyone 10+\"\n                            },\n                            \"developers\": [\n                                {\n                                    \"id\": \"dev_1\",\n                                    \"name\": \"West Coast Software\"\n                                }\n                            ]\n                        }\n                    ]\n                }\n            ]\n        }\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Create game",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let currentGame = pm.collectionVariables.get(\"newGameTitle\") || \"newGame\"\r",
+									"\r",
+									"// Use a regular expression to check if the current game ends with a number\r",
+									"let numberPattern = /\\d+$/\r",
+									"let match = currentGame.match(numberPattern)\r",
+									"\r",
+									"// Determine the next number to append. If no number exists, start from 1.\r",
+									"let newNumber = match ? parseInt(match[0]) + 1 : 1\r",
+									"\r",
+									"let adjustedGameTitle = currentGame.replace(numberPattern, '') + newNumber\r",
+									"\r",
+									"pm.collectionVariables.set('newGameTitle', adjustedGameTitle)\r",
+									"\r",
+									"// Make sure year is a number and update it\r",
+									"let newGameReleaseYear = pm.collectionVariables.get(\"newGameReleaseYear\")\r",
+									"newGameReleaseYear = Number(newGameReleaseYear)\r",
+									"pm.collectionVariables.set(\"newGameReleaseYear\", newGameReleaseYear++)\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201 when creating a new game\", function () {\r",
+									"  pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"let response = pm.response.json();\r",
+									"let gameData = response.data.addGame\r",
+									"\r",
+									"pm.test(\"Response contains new game ID\", function () {\r",
+									"        pm.expect(gameData).to.have.property('id')\r",
+									"})\r",
+									"\r",
+									"let newGameId = gameData.id\r",
+									"\r",
+									"pm.collectionVariables.set('newGameId', newGameId);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation {\r\n  addGame(data: {\r\n    title: \"{{newGameTitle}}\",\r\n    release_year: {{newGameReleaseYear}},\r\n    genre: [\"{{newGameGenreId}}\"],\r\n    platforms: [\"{{newGamePlatformId}}\"],\r\n    rating: \"{{newGameRatingId}}\",\r\n    developers: [\"{{newGameDeveloperId}}\"]\r\n  }) {\r\n    id\r\n    title\r\n    release_year\r\n    genres {\r\n        id\r\n        name\r\n    }\r\n    platforms {\r\n        id\r\n        name\r\n    }\r\n    rating {\r\n        id\r\n        text\r\n    }\r\n    developers {\r\n        id\r\n        name\r\n    }\r\n  }\r\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}",
+							"host": [
+								"{{baseUrl}}"
+							]
+						},
+						"description": "Mutation to create a new **game.** Requires authentication with a JWT.\n\n`Authentication: Bearer token`"
+					},
+					"response": [
+						{
+							"name": "Create game",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation {\r\n  addGame(data: {\r\n    title: \"newGame\",\r\n    release_year: 2025,\r\n    genre: [\"genre_2\"],\r\n    platforms: [\"platform_2\"],\r\n    rating: \"rating_2\",\r\n    developers: [\"dev_2\"]\r\n  }) {\r\n    id\r\n  }\r\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "https://api-design-theta.vercel.app/graphql",
+									"protocol": "https",
+									"host": [
+										"api-design-theta",
+										"vercel",
+										"app"
+									],
+									"path": [
+										"graphql"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Cache-Control",
+									"value": "public, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Content-Length",
+									"value": "41"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 06 Apr 2025 08:39:54 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Vercel"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=63072000; includeSubDomains; preload"
+								},
+								{
+									"key": "X-Vercel-Cache",
+									"value": "MISS"
+								},
+								{
+									"key": "X-Vercel-Id",
+									"value": "arn1::arn1::4vqgd-1743928793948-7e39e966c5c5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"addGame\": {\n            \"id\": \"game_474420\"\n        }\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Create game - No Authentication",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 401 when creating a game with no authentication\", function () {\r",
+									"  pm.response.to.have.status(401)\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation {\r\n  addGame(data: {\r\n    title: \"{{newGameTitle}}\",\r\n    release_year: 2025,\r\n    genre: [\"{{newGameGenreId}}\"],\r\n    platforms: [\"{{newGamePlatformId}}\"],\r\n    rating: \"{{newGameRatingId}}\",\r\n    developers: [\"{{newGameDeveloperId}}\"]\r\n  }) {\r\n    id\r\n  }\r\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}",
+							"host": [
+								"{{baseUrl}}"
+							]
+						},
+						"description": "Example of mutation of game creation without a JWT token"
+					},
+					"response": [
+						{
+							"name": "Create game - No Authentication",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation {\r\n  addGame(data: {\r\n    title: \"newGame\",\r\n    release_year: 2025,\r\n    genre: [\"genre_2\"],\r\n    platforms: [\"platform_2\"],\r\n    rating: \"rating_2\",\r\n    developers: [\"dev_2\"]\r\n  }) {\r\n    id\r\n  }\r\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "https://api-design-theta.vercel.app/graphql",
+									"protocol": "https",
+									"host": [
+										"api-design-theta",
+										"vercel",
+										"app"
+									],
+									"path": [
+										"graphql"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Cache-Control",
+									"value": "public, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Content-Length",
+									"value": "109"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 06 Apr 2025 20:57:24 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Vercel"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=63072000; includeSubDomains; preload"
+								},
+								{
+									"key": "X-Vercel-Cache",
+									"value": "MISS"
+								},
+								{
+									"key": "X-Vercel-Id",
+									"value": "arn1::arn1::blpw5-1743973044677-ac5b4efc951a"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"errors\": [\n        {\n            \"message\": \"Authentication required\",\n            \"code\": \"AuthorizationError\",\n            \"path\": [\n                \"addGame\"\n            ]\n        }\n    ],\n    \"data\": null\n}"
+						}
+					]
+				},
+				{
+					"name": "Update game",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 when updating a game\", function () {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"let response = pm.response.json();\r",
+									"let game = response.data.updateGame\r",
+									"\r",
+									"pm.test(\"Response contains the expected game structure\", function () {\r",
+									"        pm.expect(game).to.have.property('id')\r",
+									"        pm.expect(game).to.have.property('title')\r",
+									"        pm.expect(game).to.have.property('release_year')\r",
+									"        pm.expect(game).to.have.property('platforms')\r",
+									"        pm.expect(game).to.have.property('genres')\r",
+									"        pm.expect(game).to.have.property('rating')\r",
+									"        pm.expect(game).to.have.property('developers')\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation {\r\n  updateGame(id: \"{{newGameId}}\", data: {\r\n    title: \"{{updatedGameTitle}}\",\r\n    release_year: 2026,\r\n    genres: [\"{{updatedGameGenre}}\"],\r\n    platforms: [\"{{updatedGamePlatform}}\"],\r\n    rating: \"{{updatedGameRating}}\",\r\n    developers: [\"{{updatedGameDeveloper}}\"]\r\n  }) {\r\n        id\r\n        title\r\n        release_year\r\n        platforms {\r\n            name\r\n        }\r\n        genres {\r\n            name\r\n        }\r\n        rating {\r\n            text\r\n        }\r\n        developers {\r\n            id\r\n            name\r\n        }\r\n    }\r\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}",
+							"host": [
+								"{{baseUrl}}"
+							]
+						},
+						"description": "Update a games information\n\nRequires a JWT token: `Authentication: Bearer token`"
+					},
+					"response": [
+						{
+							"name": "Update game",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation {\r\n  updateGame(id: \"\", data: {\r\n    title: \"updatedTitle\",\r\n    release_year: 2026,\r\n    genres: [\"genre_3\"],\r\n    platforms: [\"platform_3\"],\r\n    rating: \"rating_3\",\r\n    developers: [\"dev_3\"]\r\n  }) {\r\n        id\r\n        title\r\n        release_year\r\n        platforms {\r\n            name\r\n        }\r\n        genres {\r\n            name\r\n        }\r\n        rating {\r\n            text\r\n        }\r\n        developers {\r\n            id\r\n            name\r\n        }\r\n    }\r\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "https://api-design-theta.vercel.app/graphql",
+									"protocol": "https",
+									"host": [
+										"api-design-theta",
+										"vercel",
+										"app"
+									],
+									"path": [
+										"graphql"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Cache-Control",
+									"value": "public, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Content-Length",
+									"value": "215"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 06 Apr 2025 20:57:33 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Vercel"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=63072000; includeSubDomains; preload"
+								},
+								{
+									"key": "X-Vercel-Cache",
+									"value": "MISS"
+								},
+								{
+									"key": "X-Vercel-Id",
+									"value": "arn1::arn1::bqrmq-1743973053129-a26c2d6a5a97"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"updateGame\": {\n            \"id\": \"game_474421\",\n            \"title\": \"updatedTitle\",\n            \"release_year\": 2026,\n            \"platforms\": [\n                {\n                    \"name\": \"Xbox One\"\n                }\n            ],\n            \"genres\": null,\n            \"rating\": {\n                \"text\": \"Teen\"\n            },\n            \"developers\": [\n                {\n                    \"id\": \"dev_3\",\n                    \"name\": \"Prettygreat Pty\"\n                }\n            ]\n        }\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Update game - Invalid parameter",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400 when updating a game with invalid parameter\", function () {\r",
+									"  pm.response.to.have.status(400)\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation {\r\n  updateGame(id: \"{{newGameId}}\", data: {\r\n    tittle: \"{{updatedGameTitle}}\",\r\n  }) {\r\n        id\r\n        title\r\n    }\r\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}",
+							"host": [
+								"{{baseUrl}}"
+							]
+						},
+						"description": "Example of updating a game without authentication token"
+					},
+					"response": [
+						{
+							"name": "Update game - Invalid parameter",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation {\r\n  updateGame(id: \"\", data: {\r\n    tittle: \"updatedTitle\",\r\n  }) {\r\n        id\r\n        title\r\n    }\r\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "https://api-design-theta.vercel.app/graphql",
+									"protocol": "https",
+									"host": [
+										"api-design-theta",
+										"vercel",
+										"app"
+									],
+									"path": [
+										"graphql"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Cache-Control",
+									"value": "public, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Content-Length",
+									"value": "156"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 06 Apr 2025 21:36:03 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Vercel"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=63072000; includeSubDomains; preload"
+								},
+								{
+									"key": "X-Vercel-Cache",
+									"value": "MISS"
+								},
+								{
+									"key": "X-Vercel-Id",
+									"value": "arn1::arn1::mz6m9-1743975363544-45e6580b845c"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"errors\": [\n        {\n            \"message\": \"Graphql validation error\",\n            \"code\": \"FastifyError\"\n        }\n    ],\n    \"extensions\": {\n        \"service\": \"game-api-service\",\n        \"timestamp\": \"2025-04-06T21:36:03.575Z\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete game",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204 when deleting a game\", function () {\r",
+									"  pm.response.to.have.status(204)\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation {\r\n\tdeleteGame(id: \"{{newGameId}}\")\r\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}",
+							"host": [
+								"{{baseUrl}}"
+							]
+						},
+						"description": "Mutation of a **game deletion**.\n\nRequires a JWT token. `Authentication: Bearer token`"
+					},
+					"response": [
+						{
+							"name": "Delete game",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation {\r\n\tdeleteGame(id: \"\")\r\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "https://api-design-theta.vercel.app/graphql",
+									"protocol": "https",
+									"host": [
+										"api-design-theta",
+										"vercel",
+										"app"
+									],
+									"path": [
+										"graphql"
+									]
+								}
+							},
+							"status": "No Content",
+							"code": 204,
+							"_postman_previewlanguage": "plain",
+							"header": [
+								{
+									"key": "Cache-Control",
+									"value": "public, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 06 Apr 2025 20:59:08 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Vercel"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=63072000; includeSubDomains; preload"
+								},
+								{
+									"key": "X-Vercel-Cache",
+									"value": "MISS"
+								},
+								{
+									"key": "X-Vercel-Id",
+									"value": "arn1::arn1::xzqz8-1743973148316-6669c4b6b22e"
+								}
+							],
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "Delete game - Invalid GameId",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404 when deleting a game\", function () {\r",
+									"  pm.response.to.have.status(404)\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation {\r\n\tdeleteGame(id: \"{{invalidGameId}}\")\r\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}",
+							"host": [
+								"{{baseUrl}}"
+							]
+						},
+						"description": "Example of game deletion with an invalid game id"
+					},
+					"response": [
+						{
+							"name": "Delete game - Invalid GameId",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation {\r\n\tdeleteGame(id: \"invalidGame_1\")\r\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "https://api-design-theta.vercel.app/graphql",
+									"protocol": "https",
+									"host": [
+										"api-design-theta",
+										"vercel",
+										"app"
+									],
+									"path": [
+										"graphql"
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Cache-Control",
+									"value": "public, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Content-Length",
+									"value": "127"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 06 Apr 2025 20:59:16 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Vercel"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=63072000; includeSubDomains; preload"
+								},
+								{
+									"key": "X-Vercel-Cache",
+									"value": "MISS"
+								},
+								{
+									"key": "X-Vercel-Id",
+									"value": "arn1::arn1::gjztj-1743973156960-268a26bdd3ed"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"errors\": [\n        {\n            \"message\": \"Document not found: Failed to delete game\",\n            \"code\": \"RepositoryError\",\n            \"path\": [\n                \"deleteGame\"\n            ]\n        }\n    ],\n    \"data\": null\n}"
+						}
+					]
+				}
+			],
+			"description": "_Query_ **Games** or an individual **Game** with an **Id**\n\n_Mutate_ a Game resource by **creating**, **updating** or **deleting** it with a **token** as authentication.\n\n`Authentication: Bearer token`"
+		},
+		{
+			"name": "Genres",
+			"item": [
+				{
+					"name": "Get genres",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 when fetching all genres\", function () {\r",
+									"  pm.response.to.have.status(200)\r",
+									"});\r",
+									"\r",
+									"let response = pm.response.json()\r",
+									"let genres = response.data.genres\r",
+									"\r",
+									"pm.test(\"Response contains the expected genre structure\", function () {\r",
+									"    pm.expect(genres).to.be.an('array')\r",
+									"    genres.forEach(genre => {\r",
+									"        pm.expect(genre).to.have.property('id')\r",
+									"        pm.expect(genre).to.have.property('name')\r",
+									"    })\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query {\r\n    genres {\r\n        id\r\n        name\r\n    }\r\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}",
+							"host": [
+								"{{baseUrl}}"
+							]
+						},
+						"description": "Query **all genres**"
+					},
+					"response": [
+						{
+							"name": "Get genres",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query {\r\n    genres {\r\n        id\r\n        name\r\n    }\r\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "https://api-design-theta.vercel.app/graphql",
+									"protocol": "https",
+									"host": [
+										"api-design-theta",
+										"vercel",
+										"app"
+									],
+									"path": [
+										"graphql"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Cache-Control",
+									"value": "public, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Content-Length",
+									"value": "693"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 06 Apr 2025 20:59:24 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Vercel"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=63072000; includeSubDomains; preload"
+								},
+								{
+									"key": "X-Vercel-Cache",
+									"value": "MISS"
+								},
+								{
+									"key": "X-Vercel-Id",
+									"value": "arn1::arn1::drhqc-1743973164557-37c7457b0741"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"genres\": [\n            {\n                \"id\": \"genre_1\",\n                \"name\": \"Adventure\"\n            },\n            {\n                \"id\": \"genre_2\",\n                \"name\": \"Puzzle\"\n            },\n            {\n                \"id\": \"genre_3\",\n                \"name\": \"Simulation\"\n            },\n            {\n                \"id\": \"genre_4\",\n                \"name\": \"Indie\"\n            },\n            {\n                \"id\": \"genre_5\",\n                \"name\": \"Arcade\"\n            },\n            {\n                \"id\": \"genre_6\",\n                \"name\": \"Action\"\n            },\n            {\n                \"id\": \"genre_7\",\n                \"name\": \"RPG\"\n            },\n            {\n                \"id\": \"genre_8\",\n                \"name\": \"Strategy\"\n            },\n            {\n                \"id\": \"genre_9\",\n                \"name\": \"Massively Multiplayer\"\n            },\n            {\n                \"id\": \"genre_10\",\n                \"name\": \"Shooter\"\n            },\n            {\n                \"id\": \"genre_11\",\n                \"name\": \"Platformer\"\n            },\n            {\n                \"id\": \"genre_12\",\n                \"name\": \"Educational\"\n            },\n            {\n                \"id\": \"genre_13\",\n                \"name\": \"Casual\"\n            },\n            {\n                \"id\": \"genre_14\",\n                \"name\": \"Racing\"\n            },\n            {\n                \"id\": \"genre_15\",\n                \"name\": \"Sports\"\n            },\n            {\n                \"id\": \"genre_16\",\n                \"name\": \"Fighting\"\n            },\n            {\n                \"id\": \"genre_17\",\n                \"name\": \"Family\"\n            },\n            {\n                \"id\": \"genre_18\",\n                \"name\": \"Board Games\"\n            },\n            {\n                \"id\": \"genre_19\",\n                \"name\": \"Card\"\n            }\n        ]\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get genre",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 when fetching a signle genre\", function () {\r",
+									"  pm.response.to.have.status(200)\r",
+									"})\r",
+									"\r",
+									"let response = pm.response.json()\r",
+									"let genre = response.data.genre\r",
+									"\r",
+									"pm.test(\"Response contains the expected genre structure\", function () {\r",
+									"    pm.expect(genre).to.have.property('id')\r",
+									"    pm.expect(genre).to.have.property('name')\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query {\r\n    genre(id: \"{{genreId}}\") {\r\n        id\r\n        name\r\n    }\r\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}",
+							"host": [
+								"{{baseUrl}}"
+							]
+						},
+						"description": "Query a **single genre** based in its **id**"
+					},
+					"response": [
+						{
+							"name": "Get genre",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query {\r\n    genre(id: \"genre_1\") {\r\n        id\r\n        name\r\n    }\r\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "https://api-design-theta.vercel.app/graphql",
+									"protocol": "https",
+									"host": [
+										"api-design-theta",
+										"vercel",
+										"app"
+									],
+									"path": [
+										"graphql"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Cache-Control",
+									"value": "public, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Content-Length",
+									"value": "54"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 06 Apr 2025 20:59:33 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Vercel"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=63072000; includeSubDomains; preload"
+								},
+								{
+									"key": "X-Vercel-Cache",
+									"value": "MISS"
+								},
+								{
+									"key": "X-Vercel-Id",
+									"value": "arn1::arn1::4wrjm-1743973173749-2d4edac83b90"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"genre\": {\n            \"id\": \"genre_1\",\n            \"name\": \"Adventure\"\n        }\n    }\n}"
+						}
+					]
+				}
+			],
+			"description": "Query **Genres** or an individual **Genre**"
+		},
+		{
+			"name": "Platforms",
+			"item": [
+				{
+					"name": "Get platforms",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 when fetching all platforms\", function () {\r",
+									"  pm.response.to.have.status(200)\r",
+									"});\r",
+									"\r",
+									"let response = pm.response.json()\r",
+									"let platforms = response.data.platforms\r",
+									"\r",
+									"pm.test(\"Response contains the expected platform structure\", function () {\r",
+									"    pm.expect(platforms).to.be.an('array')\r",
+									"    platforms.forEach(platform => {\r",
+									"        pm.expect(platform).to.have.property('id')\r",
+									"        pm.expect(platform).to.have.property('name')\r",
+									"    })\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query {\r\n    platforms {\r\n        id\r\n        name\r\n    }\r\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}",
+							"host": [
+								"{{baseUrl}}"
+							]
+						},
+						"description": "Query **multiple platforms**"
+					},
+					"response": [
+						{
+							"name": "Get paltforms",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query {\r\n    platforms {\r\n        id\r\n        name\r\n    }\r\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "https://api-design-theta.vercel.app/graphql",
+									"protocol": "https",
+									"host": [
+										"api-design-theta",
+										"vercel",
+										"app"
+									],
+									"path": [
+										"graphql"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Cache-Control",
+									"value": "public, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Content-Encoding",
+									"value": "br"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 06 Apr 2025 20:59:47 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Vercel"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=63072000; includeSubDomains; preload"
+								},
+								{
+									"key": "X-Vercel-Cache",
+									"value": "MISS"
+								},
+								{
+									"key": "X-Vercel-Id",
+									"value": "arn1::arn1::qm54t-1743973187925-899f61fb59d0"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"platforms\": [\n            {\n                \"id\": \"platform_1\",\n                \"name\": \"PC\"\n            },\n            {\n                \"id\": \"platform_2\",\n                \"name\": \"macOS\"\n            },\n            {\n                \"id\": \"platform_3\",\n                \"name\": \"Xbox One\"\n            },\n            {\n                \"id\": \"platform_4\",\n                \"name\": \"PlayStation 4\"\n            },\n            {\n                \"id\": \"platform_5\",\n                \"name\": \"Nintendo Switch\"\n            },\n            {\n                \"id\": \"platform_6\",\n                \"name\": \"iOS\"\n            },\n            {\n                \"id\": \"platform_7\",\n                \"name\": \"Web\"\n            },\n            {\n                \"id\": \"platform_8\",\n                \"name\": \"Linux\"\n            },\n            {\n                \"id\": \"platform_9\",\n                \"name\": \"Android\"\n            },\n            {\n                \"id\": \"platform_10\",\n                \"name\": \"Nintendo 3DS\"\n            },\n            {\n                \"id\": \"platform_11\",\n                \"name\": \"PS Vita\"\n            },\n            {\n                \"id\": \"platform_12\",\n                \"name\": \"Xbox 360\"\n            },\n            {\n                \"id\": \"platform_13\",\n                \"name\": \"PlayStation 3\"\n            },\n            {\n                \"id\": \"platform_14\",\n                \"name\": \"PlayStation 2\"\n            },\n            {\n                \"id\": \"platform_15\",\n                \"name\": \"Xbox\"\n            },\n            {\n                \"id\": \"platform_16\",\n                \"name\": \"Wii\"\n            },\n            {\n                \"id\": \"platform_17\",\n                \"name\": \"Game Boy Advance\"\n            },\n            {\n                \"id\": \"platform_18\",\n                \"name\": \"Classic Macintosh\"\n            },\n            {\n                \"id\": \"platform_19\",\n                \"name\": \"Wii U\"\n            },\n            {\n                \"id\": \"platform_20\",\n                \"name\": \"Nintendo 64\"\n            },\n            {\n                \"id\": \"platform_21\",\n                \"name\": \"Game Boy\"\n            },\n            {\n                \"id\": \"platform_22\",\n                \"name\": \"SNES\"\n            },\n            {\n                \"id\": \"platform_23\",\n                \"name\": \"PlayStation\"\n            },\n            {\n                \"id\": \"platform_24\",\n                \"name\": \"PSP\"\n            },\n            {\n                \"id\": \"platform_25\",\n                \"name\": \"Nintendo DS\"\n            },\n            {\n                \"id\": \"platform_26\",\n                \"name\": \"Commodore / Amiga\"\n            },\n            {\n                \"id\": \"platform_27\",\n                \"name\": \"GameCube\"\n            },\n            {\n                \"id\": \"platform_28\",\n                \"name\": \"PlayStation 5\"\n            },\n            {\n                \"id\": \"platform_29\",\n                \"name\": \"Dreamcast\"\n            },\n            {\n                \"id\": \"platform_30\",\n                \"name\": \"SEGA Master System\"\n            },\n            {\n                \"id\": \"platform_31\",\n                \"name\": \"3DO\"\n            },\n            {\n                \"id\": \"platform_32\",\n                \"name\": \"Atari ST\"\n            },\n            {\n                \"id\": \"platform_33\",\n                \"name\": \"NES\"\n            },\n            {\n                \"id\": \"platform_34\",\n                \"name\": \"Genesis\"\n            },\n            {\n                \"id\": \"platform_35\",\n                \"name\": \"Game Gear\"\n            },\n            {\n                \"id\": \"platform_36\",\n                \"name\": \"Neo Geo\"\n            },\n            {\n                \"id\": \"platform_37\",\n                \"name\": \"SEGA CD\"\n            },\n            {\n                \"id\": \"platform_38\",\n                \"name\": \"Game Boy Color\"\n            },\n            {\n                \"id\": \"platform_39\",\n                \"name\": \"Nintendo DSi\"\n            },\n            {\n                \"id\": \"platform_40\",\n                \"name\": \"SEGA Saturn\"\n            },\n            {\n                \"id\": \"platform_41\",\n                \"name\": \"Apple II\"\n            },\n            {\n                \"id\": \"platform_42\",\n                \"name\": \"Jaguar\"\n            },\n            {\n                \"id\": \"platform_43\",\n                \"name\": \"Atari 8-bit\"\n            },\n            {\n                \"id\": \"platform_44\",\n                \"name\": \"Xbox Series S/X\"\n            },\n            {\n                \"id\": \"platform_45\",\n                \"name\": \"Atari 2600\"\n            },\n            {\n                \"id\": \"platform_46\",\n                \"name\": \"Atari 5200\"\n            },\n            {\n                \"id\": \"platform_47\",\n                \"name\": \"SEGA 32X\"\n            },\n            {\n                \"id\": \"platform_48\",\n                \"name\": \"Atari Lynx\"\n            },\n            {\n                \"id\": \"platform_49\",\n                \"name\": \"Atari 7800\"\n            },\n            {\n                \"id\": \"platform_50\",\n                \"name\": \"Atari XEGS\"\n            },\n            {\n                \"id\": \"platform_51\",\n                \"name\": \"Atari Flashback\"\n            }\n        ]\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get platform",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 when fetching a signle platform\", function () {\r",
+									"  pm.response.to.have.status(200)\r",
+									"})\r",
+									"\r",
+									"let response = pm.response.json()\r",
+									"let platform = response.data.platform\r",
+									"\r",
+									"pm.test(\"Response contains the expected platform structure\", function () {\r",
+									"    pm.expect(platform).to.have.property('id')\r",
+									"    pm.expect(platform).to.have.property('name')\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query {\r\n    platform(id: \"{{platformId}}\") {\r\n        id\r\n        name\r\n    }\r\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}",
+							"host": [
+								"{{baseUrl}}"
+							]
+						},
+						"description": "Query a **single platform** based in its **id**"
+					},
+					"response": [
+						{
+							"name": "Get platform",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query {\r\n    platform(id: \"platform_1\") {\r\n        id\r\n        name\r\n    }\r\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "https://api-design-theta.vercel.app/graphql",
+									"protocol": "https",
+									"host": [
+										"api-design-theta",
+										"vercel",
+										"app"
+									],
+									"path": [
+										"graphql"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Cache-Control",
+									"value": "public, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Content-Length",
+									"value": "53"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 06 Apr 2025 20:59:56 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Vercel"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=63072000; includeSubDomains; preload"
+								},
+								{
+									"key": "X-Vercel-Cache",
+									"value": "MISS"
+								},
+								{
+									"key": "X-Vercel-Id",
+									"value": "arn1::arn1::fm5f9-1743973195992-cb7cc8a1e5da"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"platform\": {\n            \"id\": \"platform_1\",\n            \"name\": \"PC\"\n        }\n    }\n}"
+						}
+					]
+				}
+			],
+			"description": "Query **Platforms** or an individual **Platform**"
+		},
+		{
+			"name": "Ratings",
+			"item": [
+				{
+					"name": "Get ratings",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 when fetching all ratings\", function () {\r",
+									"  pm.response.to.have.status(200)\r",
+									"});\r",
+									"\r",
+									"let response = pm.response.json()\r",
+									"let ratings = response.data.ratings\r",
+									"\r",
+									"pm.test(\"Response contains the expected rating structure\", function () {\r",
+									"    pm.expect(ratings).to.be.an('array')\r",
+									"    ratings.forEach(rating => {\r",
+									"        pm.expect(rating).to.have.property('id')\r",
+									"        pm.expect(rating).to.have.property('text')\r",
+									"    })\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query {\r\n    ratings {\r\n        id\r\n        text\r\n    }\r\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}",
+							"host": [
+								"{{baseUrl}}"
+							]
+						},
+						"description": "Query **multiple ratings**"
+					},
+					"response": [
+						{
+							"name": "Get ratings",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query {\r\n    ratings {\r\n        id\r\n        text\r\n    }\r\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "https://api-design-theta.vercel.app/graphql",
+									"protocol": "https",
+									"host": [
+										"api-design-theta",
+										"vercel",
+										"app"
+									],
+									"path": [
+										"graphql"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Cache-Control",
+									"value": "public, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Content-Length",
+									"value": "245"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 06 Apr 2025 21:00:03 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Vercel"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=63072000; includeSubDomains; preload"
+								},
+								{
+									"key": "X-Vercel-Cache",
+									"value": "MISS"
+								},
+								{
+									"key": "X-Vercel-Id",
+									"value": "arn1::arn1::hp9n9-1743973203627-adcc72351941"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"ratings\": [\n            {\n                \"id\": \"rating_1\",\n                \"text\": \"Everyone 10+\"\n            },\n            {\n                \"id\": \"rating_2\",\n                \"text\": \"Everyone\"\n            },\n            {\n                \"id\": \"rating_3\",\n                \"text\": \"Teen\"\n            },\n            {\n                \"id\": \"rating_4\",\n                \"text\": \"Mature\"\n            },\n            {\n                \"id\": \"rating_5\",\n                \"text\": \"Adults Only\"\n            },\n            {\n                \"id\": \"rating_6\",\n                \"text\": \"Rating Pending\"\n            }\n        ]\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get rating",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 when fetching a single rating\", function () {\r",
+									"  pm.response.to.have.status(200)\r",
+									"})\r",
+									"\r",
+									"let response = pm.response.json()\r",
+									"let rating = response.data.rating\r",
+									"\r",
+									"pm.test(\"Response contains the expected rating structure\", function () {\r",
+									"    pm.expect(rating).to.have.property('id')\r",
+									"    pm.expect(rating).to.have.property('text')\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query {\r\n    rating(id: \"{{ratingId}}\") {\r\n        id\r\n        text\r\n    }\r\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}",
+							"host": [
+								"{{baseUrl}}"
+							]
+						},
+						"description": "Query a **single rating** based in its **id**"
+					},
+					"response": [
+						{
+							"name": "Get rating",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query {\r\n    rating(id: \"rating_1\") {\r\n        id\r\n        text\r\n    }\r\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "https://api-design-theta.vercel.app/graphql",
+									"protocol": "https",
+									"host": [
+										"api-design-theta",
+										"vercel",
+										"app"
+									],
+									"path": [
+										"graphql"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Cache-Control",
+									"value": "public, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Content-Length",
+									"value": "59"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 06 Apr 2025 21:00:17 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Vercel"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=63072000; includeSubDomains; preload"
+								},
+								{
+									"key": "X-Vercel-Cache",
+									"value": "MISS"
+								},
+								{
+									"key": "X-Vercel-Id",
+									"value": "arn1::arn1::k9dbp-1743973217871-615e572fadfe"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"rating\": {\n            \"id\": \"rating_1\",\n            \"text\": \"Everyone 10+\"\n        }\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get rating of game",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query {\r\n    rating(gameId: \"{{ratingGameId}}\") {\r\n        id\r\n        text\r\n    }\r\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}",
+							"host": [
+								"{{baseUrl}}"
+							]
+						},
+						"description": "Query a rating of a single game based in its **id**"
+					},
+					"response": [
+						{
+							"name": "Get rating of game",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query {\r\n    rating(gameId: \"game_1\") {\r\n        id\r\n        text\r\n    }\r\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "https://api-design-theta.vercel.app/graphql",
+									"protocol": "https",
+									"host": [
+										"api-design-theta",
+										"vercel",
+										"app"
+									],
+									"path": [
+										"graphql"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "content-type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "content-length",
+									"value": "59"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 04 Apr 2025 18:55:52 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=72"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"rating\": {\n            \"id\": \"rating_1\",\n            \"text\": \"Everyone 10+\"\n        }\n    }\n}"
+						}
+					]
+				}
+			],
+			"description": "Query **Ratings** or an individual **Rating**"
+		},
+		{
+			"name": "Developers",
+			"item": [
+				{
+					"name": "Get developers",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 when fetching all developers\", function () {\r",
+									"  pm.response.to.have.status(200)\r",
+									"});\r",
+									"\r",
+									"let response = pm.response.json()\r",
+									"let developers = response.data.developers\r",
+									"\r",
+									"pm.test(\"Response contains the expected developer structure\", function () {\r",
+									"    pm.expect(developers).to.be.an('array')\r",
+									"    developers.forEach(developer => {\r",
+									"        pm.expect(developer).to.have.property('id')\r",
+									"        pm.expect(developer).to.have.property('name')\r",
+									"    })\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query {\r\n    developers(limit: 5) {\r\n        id\r\n        name\r\n    }\r\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}",
+							"host": [
+								"{{baseUrl}}"
+							]
+						},
+						"description": "Query **multiple developers**\n\n_Options_:\n\n- limit: Limit the number of results with a positive number"
+					},
+					"response": [
+						{
+							"name": "Get developers",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query {\r\n    developers(limit: 5) {\r\n        id\r\n        name\r\n    }\r\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "https://api-design-theta.vercel.app/graphql",
+									"protocol": "https",
+									"host": [
+										"api-design-theta",
+										"vercel",
+										"app"
+									],
+									"path": [
+										"graphql"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Cache-Control",
+									"value": "public, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Content-Length",
+									"value": "225"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 06 Apr 2025 21:01:42 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Vercel"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=63072000; includeSubDomains; preload"
+								},
+								{
+									"key": "X-Vercel-Cache",
+									"value": "MISS"
+								},
+								{
+									"key": "X-Vercel-Id",
+									"value": "arn1::arn1::tpx4x-1743973301988-a673fe9bfa15"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"developers\": [\n            {\n                \"id\": \"dev_1\",\n                \"name\": \"West Coast Software\"\n            },\n            {\n                \"id\": \"dev_2\",\n                \"name\": \"Soma Games\"\n            },\n            {\n                \"id\": \"dev_3\",\n                \"name\": \"Prettygreat Pty\"\n            },\n            {\n                \"id\": \"dev_4\",\n                \"name\": \"Oasis Games\"\n            },\n            {\n                \"id\": \"dev_5\",\n                \"name\": \"Geronimo Interactive\"\n            }\n        ]\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get developer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 when fetching a single developer\", function () {\r",
+									"  pm.response.to.have.status(200)\r",
+									"});\r",
+									"\r",
+									"let response = pm.response.json()\r",
+									"let developer = response.data.developer\r",
+									"\r",
+									"pm.test(\"Response contains the expected developer structure\", function () {\r",
+									"    pm.expect(developer).to.have.property('id')\r",
+									"    pm.expect(developer).to.have.property('name')\r",
+									"    pm.expect(developer).to.have.property('games')\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query {\r\n    developer(id: \"{{developerId}}\") {\r\n        id\r\n        name\r\n        games {\r\n            id\r\n            title\r\n        }\r\n    }\r\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}",
+							"host": [
+								"{{baseUrl}}"
+							]
+						},
+						"description": "Query a single **developer** based in its **id**"
+					},
+					"response": [
+						{
+							"name": "Get developer",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query {\r\n    developer(id: \"dev_1\") {\r\n        id\r\n        name\r\n        games {\r\n            id\r\n            title\r\n        }\r\n    }\r\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "https://api-design-theta.vercel.app/graphql",
+									"protocol": "https",
+									"host": [
+										"api-design-theta",
+										"vercel",
+										"app"
+									],
+									"path": [
+										"graphql"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Cache-Control",
+									"value": "public, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Content-Length",
+									"value": "267"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 06 Apr 2025 21:38:24 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Vercel"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=63072000; includeSubDomains; preload"
+								},
+								{
+									"key": "X-Vercel-Cache",
+									"value": "MISS"
+								},
+								{
+									"key": "X-Vercel-Id",
+									"value": "arn1::arn1::mz6m9-1743975504317-c6169f986832"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"developer\": {\n            \"id\": \"dev_1\",\n            \"name\": \"West Coast Software\",\n            \"games\": [\n                {\n                    \"id\": \"game_1\",\n                    \"title\": \"D/Generation HD\"\n                },\n                {\n                    \"id\": \"game_438317\",\n                    \"title\": \"Splat the Fruit\"\n                },\n                {\n                    \"id\": \"game_438813\",\n                    \"title\": \"D/Generation: The Original\"\n                },\n                {\n                    \"id\": \"game_447921\",\n                    \"title\": \"D/Generation\"\n                }\n            ]\n        }\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get developer with games",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 when fetching a single developer with games\", function () {\r",
+									"  pm.response.to.have.status(200)\r",
+									"});\r",
+									"\r",
+									"let response = pm.response.json()\r",
+									"let developer = response.data.developer\r",
+									"\r",
+									"pm.test(\"Response contains the expected developer structure\", function () {\r",
+									"    pm.expect(developer).to.have.property('id')\r",
+									"    pm.expect(developer).to.have.property('name')\r",
+									"    pm.expect(developer).to.have.property('games')\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Response contains the expected games structure from a developer\", function () {\r",
+									"    let games = developer.games\r",
+									"    pm.expect(games).to.be.an('array')\r",
+									"    games.forEach(game => {\r",
+									"        pm.expect(game).to.have.property('id')\r",
+									"        pm.expect(game).to.have.property('title')\r",
+									"    })\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query {\r\n    developer(id: \"{{developerId}}\") {\r\n        id\r\n        name\r\n        games {\r\n            id\r\n            title\r\n        }\r\n    }\r\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}",
+							"host": [
+								"{{baseUrl}}"
+							]
+						},
+						"description": "Query a **developer** and its **games** based in its **id**"
+					},
+					"response": [
+						{
+							"name": "Get developer with games",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query {\r\n    developer(id: \"dev_1\") {\r\n        id\r\n        name\r\n        games {\r\n            id\r\n            title\r\n        }\r\n    }\r\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "https://api-design-theta.vercel.app/graphql",
+									"protocol": "https",
+									"host": [
+										"api-design-theta",
+										"vercel",
+										"app"
+									],
+									"path": [
+										"graphql"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Cache-Control",
+									"value": "public, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Content-Length",
+									"value": "267"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 06 Apr 2025 21:27:58 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Vercel"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=63072000; includeSubDomains; preload"
+								},
+								{
+									"key": "X-Vercel-Cache",
+									"value": "MISS"
+								},
+								{
+									"key": "X-Vercel-Id",
+									"value": "arn1::arn1::4msqc-1743974877440-43ae8ad35e4a"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"developer\": {\n            \"id\": \"dev_1\",\n            \"name\": \"West Coast Software\",\n            \"games\": [\n                {\n                    \"id\": \"game_1\",\n                    \"title\": \"D/Generation HD\"\n                },\n                {\n                    \"id\": \"game_438317\",\n                    \"title\": \"Splat the Fruit\"\n                },\n                {\n                    \"id\": \"game_438813\",\n                    \"title\": \"D/Generation: The Original\"\n                },\n                {\n                    \"id\": \"game_447921\",\n                    \"title\": \"D/Generation\"\n                }\n            ]\n        }\n    }\n}"
+						}
+					]
+				}
+			],
+			"description": "Query **Developers** or an individual **Developer** and see related **games**"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "https://api-design-theta.vercel.app/graphql",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "newUserEmail",
+			"value": "newusername@test.com",
+			"type": "string"
+		},
+		{
+			"key": "newUsername",
+			"value": "newusername",
+			"type": "string"
+		},
+		{
+			"key": "newUserPassword",
+			"value": "newUserPassword123",
+			"type": "string"
+		},
+		{
+			"key": "newUserId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "existingUserEmail",
+			"value": "existinguser@test.com",
+			"type": "string"
+		},
+		{
+			"key": "existingUsername",
+			"value": "existinguser",
+			"type": "string"
+		},
+		{
+			"key": "existingUserPassword",
+			"value": "existingpassword123",
+			"type": "string"
+		},
+		{
+			"key": "wrongUsername",
+			"value": "wrongusername",
+			"type": "string"
+		},
+		{
+			"key": "wrongUserPassword",
+			"value": "wrongpassword",
+			"type": "string"
+		},
+		{
+			"key": "genreId",
+			"value": "genre_1",
+			"type": "string"
+		},
+		{
+			"key": "platformId",
+			"value": "platform_1",
+			"type": "string"
+		},
+		{
+			"key": "ratingId",
+			"value": "rating_1",
+			"type": "string"
+		},
+		{
+			"key": "gameId",
+			"value": "game_1",
+			"type": "string"
+		},
+		{
+			"key": "developerId",
+			"value": "dev_1",
+			"type": "string"
+		},
+		{
+			"key": "newGameTitle",
+			"value": "newGame",
+			"type": "string"
+		},
+		{
+			"key": "newGameReleaseYear",
+			"value": "2025",
+			"type": "string"
+		},
+		{
+			"key": "newGameGenreId",
+			"value": "genre_2",
+			"type": "string"
+		},
+		{
+			"key": "newGamePlatformId",
+			"value": "platform_2",
+			"type": "string"
+		},
+		{
+			"key": "newGameRatingId",
+			"value": "rating_2",
+			"type": "string"
+		},
+		{
+			"key": "newGameDeveloperId",
+			"value": "dev_2",
+			"type": "string"
+		},
+		{
+			"key": "wrongGameId",
+			"value": "wrongGame_1",
+			"type": "string"
+		},
+		{
+			"key": "newGameId",
+			"value": ""
+		},
+		{
+			"key": "updatedGameTitle",
+			"value": "updatedTitle",
+			"type": "string"
+		},
+		{
+			"key": "updatedGameYear",
+			"value": "2026",
+			"type": "string"
+		},
+		{
+			"key": "updatedGameGenre",
+			"value": "genre_3",
+			"type": "string"
+		},
+		{
+			"key": "updatedGamePlatform",
+			"value": "platform_3",
+			"type": "string"
+		},
+		{
+			"key": "updatedGameRating",
+			"value": "rating_3",
+			"type": "string"
+		},
+		{
+			"key": "updatedGameDeveloper",
+			"value": "dev_3",
+			"type": "string"
+		},
+		{
+			"key": "invalidGameGenre",
+			"value": "invalidGenre_1",
+			"type": "string"
+		},
+		{
+			"key": "invalidGameId",
+			"value": "invalidGame_1",
+			"type": "string"
+		},
+		{
+			"key": "ratingGameId",
+			"value": "game_1",
+			"type": "string"
+		}
+	]
+}
