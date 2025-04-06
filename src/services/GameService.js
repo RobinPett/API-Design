@@ -31,6 +31,8 @@ export class GameService {
      * @return {Array} - Array of games
      */
     async getGames(filter, limit) {
+        // Check if contents of filter is undefined or null
+        console.log('Filter:', filter)
         const options = { limit: limit }
         return await this._repository.get(filter, null, options)
     }
