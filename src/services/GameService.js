@@ -30,8 +30,7 @@ export class GameService {
      * @param {object} filter - Filter object to filter games
      * @return {Array} - Array of games
      */
-    async getGames(release_year, limit) {
-        const filter = { release_year }
+    async getGames(filter, limit) {
         const options = { limit: limit }
         return await this._repository.get(filter, null, options)
     }
