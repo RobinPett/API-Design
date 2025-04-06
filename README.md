@@ -32,8 +32,8 @@ The API is in production on Vercel.
      - **Navigate to the Project Directory:** Change directory to the cloned repository.
      - **Install Dependencies:** Install necessary packages using `npm install`.
      - **Configure Environment Variables:** Set up the `.env` file with required environment variables. Use [.example.env](./.example.env) to see required environmental variables
-     - **Seed database:** Use `npm run seed` to run the seedscript.
-     - **Start server:** Use `npm run dev` to start the server.
+     - **Seed database:** Use `npm run seed` to run the seed script.
+     - **Start server:** Use `npm run dev` to run the server locally.
 
    - **Testing with Postman:**
      - **Import the Collection:** Guide on how to import the provided Postman collection.
