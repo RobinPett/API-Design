@@ -11,7 +11,7 @@ export const userResolvers = {
     registerUser: async (parent, { data }, {container, reply}) => {
       const user = await getUserService(container).signUp(data)
       reply.status(201)
-      return user
+      return {id: user.id}
     },
     loginUser: async (parent, { data }, {container}) => {
       return await getUserService(container).login(data)
