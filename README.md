@@ -25,10 +25,16 @@ The API is in production on Vercel.
 
 ## Installation Instructions
    - **Steps:**
-     - **Clone the Repository:** Instructions to clone the project from GitHub.
+     - **Clone the Repository:** 
+     ```bash 
+     git clone https://github.com/RobinPett/API-Design.git
+     ```
      - **Navigate to the Project Directory:** Change directory to the cloned repository.
      - **Install Dependencies:** Install necessary packages using `npm install`.
-     - **Configure Environment Variables:** Set up the `.env` file with required environment variables.
+     - **Configure Environment Variables:** Set up the `.env` file with required environment variables. Use [.example.env](./.example.env) to see required environmental variables
+     - **Seed database:** Use `npm run seed` to run the seedscript.
+     - **Start server:** Use `npm run dev` to start the server.
+
    - **Testing with Postman:**
      - **Import the Collection:** Guide on how to import the provided Postman collection.
      - **Set Up Environment Variables:** Instructions to configure environment variables within Postman.
