@@ -6,7 +6,7 @@
 
 export const userSchema = `
   type Mutation {
-    registerUser(data: CreateUserInput!): User!
+    registerUser(data: CreateUserInput!): ID!
     loginUser(data: CreateLoginInput!): AuthPayload!
   }
 

@@ -16,7 +16,7 @@ type Query {
   }
 
   type Mutation {
-    registerUser(data: CreateUserInput!): User!
+    registerUser(data: CreateUserInput!): ID!
     loginUser(data: CreateLoginInput!): AuthPayload!
     addGame(data: CreateGameInput!): Game!
     deleteGame(id: ID!): ID!
