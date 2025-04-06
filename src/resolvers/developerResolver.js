@@ -10,8 +10,8 @@ const getGameService = (container) => container.resolve('GameService')
 
 export const developerResolvers = {
   Query: {
-    developers: async (_, filter, { container }) => {
-      return await getDeveloperService(container).getDevelopers(filter)
+    developers: async (_, {filter, limit}, { container }) => {
+      return await getDeveloperService(container).getDevelopers(filter, limit)
     },
     developer: async (_, { id }, { container }) => {
       return await getDeveloperService(container).getDeveloper(id)

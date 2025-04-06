@@ -11,11 +11,12 @@ export class GameRepository extends MongooseRepositoryBase {
         super(model)
     }
 
-    async get (filter = {}) {
+    async get (filter = {}, projection = null, options = null) {
+        // If filter.developers is an array, convert it to a string
         if (filter.developers) {
             filter['developers.id'] = filter.developers
             delete filter.developers
         }
-        return await super.get(filter)
+        return await super.get(filter, projection, options)
     }
 }

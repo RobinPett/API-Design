@@ -16,8 +16,9 @@ export class DeveloperService {
     /**
      * Get developers.
      */    
-    async getDevelopers(filter) {
-        return await this._repository.get(filter)
+    async getDevelopers(filter, limit) {
+        const options = { limit: limit }
+        return await this._repository.get(filter, null, options)
     }
 
     /**

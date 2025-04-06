@@ -41,10 +41,12 @@ export class MongooseRepositoryBase {
    * @returns {Promise<mongoose.Model[]>}
    */
   async get (filter, projection = null, options = null) {
+    console.log('Filter:', filter)
+    console.log('Projection:', projection)
+    console.log('Options:', options)
     try {
       const documents = await this.#model
         .find(filter, projection, options)
-        // .limit(10)
         .exec()
 
       if (!documents) throw new NotFoundError('Documents not found')

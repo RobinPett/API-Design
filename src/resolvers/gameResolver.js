@@ -23,9 +23,8 @@ const withAuth = (resolver) => {
 
 export const gameResolvers = {
   Query: {
-    games: async (_, filter, { container }) => {
-      const { developer, platform, genre, release_year } = filter
-      return await getGameService(container).getGames(filter)
+    games: async (_, {release_year, limit}, { container }) => {
+      return await getGameService(container).getGames(release_year, limit)
     },
     game: async (_, { id }, { container }) => {
       return await getGameService(container).getGame(id)
