@@ -5,9 +5,11 @@
  */
 
 import { UserRepository } from "../repositories/UserRepository.js"
-
 import { AuthorizationError } from "../lib/errors/AuthorizationError.js"
 
+/**
+ * Class representing a user service.
+ */
 export class UserService {
     _repository
     _jwtService
@@ -37,7 +39,6 @@ export class UserService {
         const user = await this._repository.loginUser(data)
 
         // Generate JWT
-        // TODO: Error handling?
         const token = this._jwtService.createJWT(user, process.env.JWT_SECRET, process.env.JWT_EXPIRATION)
         return { token }
     }
@@ -52,6 +53,11 @@ export class UserService {
         return await this._repository.get(id)
     }
 
+    /**
+     * Authorize user by verifying JWT token.
+     * @param {String} token 
+     * @returns {object} Decoded user object
+     */
     async authorize(token) {
         if (!token) {
             throw new AuthorizationError('No token provided')

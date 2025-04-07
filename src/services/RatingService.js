@@ -6,6 +6,9 @@
 
 import { RatingRepository } from "../repositories/RatingRepository.js"
 
+/**
+ * Class representing a rating service.
+ */
 export class RatingService {
     _repository
     

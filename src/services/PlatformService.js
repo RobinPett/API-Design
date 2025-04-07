@@ -6,6 +6,9 @@
 
 import { PlatformRepository } from "../repositories/PlatformRepository.js"
 
+/**
+ * Class representing a platform service.
+ */
 export class PlatformService {
     _repository
     

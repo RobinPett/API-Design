@@ -7,6 +7,9 @@
 import { AuthorizationError } from "../lib/errors/AuthorizationError.js"
 import { NotFoundError } from "../lib/errors/NotFoundError.js"
 
+/**
+ * Class representing a game service.
+ */
 export class GameService {
     _repository
     _developerService

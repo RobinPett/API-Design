@@ -6,6 +6,9 @@
 
 import { DeveloperRepository } from "../repositories/DeveloperRepository.js"
 
+/**
+ * Class representing a developer service.
+ */
 export class DeveloperService {
     _repository
     

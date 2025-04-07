@@ -9,7 +9,6 @@ import { mergeTypeDefs } from '@graphql-tools/merge'
 
 // Errors
 import { AuthorizationError } from '../lib/errors/AuthorizationError.js'
-import { DuplicationError } from '../lib/errors/DuplicationError.js'
 
 // Schemas
 import { gameSchema} from '../schemas/gameSchema.js'
@@ -79,8 +78,14 @@ export const mercuriousConfig = {
     }
   }
 
-// TODO: Document
-// Extract token and authorize user
+
+/**
+ * Extract token from request and authorize user
+ * 
+ * @param {object} request 
+ * @param {object} reply 
+ * @returns 
+ */
 function authorize(request, reply) {
   try {
     const authorizationHeader = request.headers['authorization'] || ''

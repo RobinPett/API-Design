@@ -6,6 +6,9 @@
 
 import { GenreRepository } from "../repositories/GenreRepository.js"
 
+/**
+ * Class representing a genre service.
+ */
 export class GenreService {
     _repository
     
