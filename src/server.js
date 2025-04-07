@@ -57,7 +57,7 @@ export default async function startServer(req, res) {
 }
 
 // Local development server
-if (process.env.NODE_ENV !== 'development') {
+if (process.env.NODE_ENV !== 'production') {
   fastifyApp.listen({port: process.env.PORT}, (error, address) => {
     if (error) {
       console.error('Error starting server:', error)
