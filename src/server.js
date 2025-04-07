@@ -9,15 +9,15 @@ import fastifyRateLimit from '@fastify/rate-limit'
 const fastifyApp = fastify(fastifyConfig)
 
 // Register mercurius for GraphQL adaptation
-fastifyApp.register(mercurius, mercuriousConfig)
+await fastifyApp.register(mercurius, mercuriousConfig)
 
 // Register helmet for security headers
-fastifyApp.register(fastifyHelmet, {
+await fastifyApp.register(fastifyHelmet, {
   contentSecurityPolicy: false
 })
 
 // Register rate limiting
-fastifyApp.register(fastifyRateLimit, {
+await fastifyApp.register(fastifyRateLimit, {
   max: 100,
   timeWindow: '1 minute',
 })
