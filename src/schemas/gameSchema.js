@@ -6,8 +6,8 @@
 
 export const gameSchema = `
   type Query {
-    games(release_year: Int, limit: Int): [Game]
-    game(id: ID!): Game
+    games(release_year: Int, limit: Int): [Game]!
+    game(id: ID!): Game!
   }
 
   type Mutation {
@@ -30,7 +30,7 @@ export const gameSchema = `
     id: ID
     title: String!
     release_year: Int!
-    genre: [ID]
+    genres: [ID]
     platforms: [ID]!
     rating: ID
     developers: [ID]!

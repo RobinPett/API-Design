@@ -59,20 +59,20 @@ export class GameService {
         try {
             this.#authrizeMutation(user)
             console.log('Add game method')
-            const { title, release_year, genre, platforms, rating, developers } = data
+            const { title, release_year, genres, platforms, rating, developers } = data
 
-            // Find genre, platform, rating and developers from respective service based on ID in data
-            // TODO: Enum for developer, platform, genre, rating
+            // Find genres, platform, rating and developers from respective service based on ID in data
+            // TODO: Enum for developer, platform, genres, rating
             const allDevelopers = await this.#fetchResource('developer', developers) 
             const allPlatforms = await this.#fetchResource('platform', platforms)
-            const allGenres = await this.#fetchResource('genre', genre)
+            const allGenres = await this.#fetchResource('genre', genres)
             const ratingObject = await this.#fetchResource('rating', rating)
 
             const newGame = {
                 title,
                 release_year,
                 platforms: allPlatforms,
-                genre: allGenres,
+                genres: allGenres,
                 rating: ratingObject,
                 developers: allDevelopers
             }
@@ -92,7 +92,7 @@ export class GameService {
     async deleteGame(id, user) {
         try {
             this.#authrizeMutation(user)
-            const game = await this.getGame(id)
+            await this.getGame(id)
             return await this._repository.delete(id)
         } catch (error) {
             console.error('Error deleting game:', error)

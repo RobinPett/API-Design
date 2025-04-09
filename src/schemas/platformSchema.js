@@ -6,8 +6,8 @@
 
 export const platformSchema = `
   type Query {
-    platforms: [Platform]
-    platform(id: ID!): Platform
+    platforms: [Platform]!
+    platform(id: ID!): Platform!
   }
 
   type Platform {

@@ -6,8 +6,8 @@
 
 export const developerSchema = `
   type Query {
-    developers(limit: Int): [Developer]
-    developer(id: ID!): Developer
+    developers(limit: Int): [Developer]!
+    developer(id: ID!): Developer!
   }
 
   type Developer {

@@ -18,7 +18,7 @@ const schema = new mongoose.Schema({
     maxlength: [50, 'Title must not be over 50 characters']
   },
   release_year: { type: Number, required: true, minlength: 4, maxlength: 4 },
-  genre: { type: [Object] },
+  genres: { type: [Object] },
   platforms: { type: [Object] },
   rating: { type: Object },
   developers: { type: Object, ref: 'Developer', required: true },

@@ -3,16 +3,16 @@
 ## Not used in the codebase.
 
 type Query {
-    developers(limit: Int): [Developer]
-    developer(id: ID!): Developer
-    games(release_year: Int, limit: Int): [Game]
-    game(id: ID!): Game
-    platforms: [Platform]
-    platform(id: ID!): Platform
-    genres: [Genre]
-    genre(id: ID, gameId: ID): Genre
-    ratings: [Rating]
-    rating(gameId: ID!): Rating
+    developers(limit: Int): [Developer]!
+    developer(id: ID!): Developer!
+    games(release_year: Int, limit: Int): [Game]!
+    game(id: ID!): Game!
+    platforms: [Platform]!
+    platform(id: ID!): Platform!
+    genres: [Genre]!
+    genre(id: ID, gameId: ID): Genre!
+    ratings: [Rating]!
+    rating(gameId: ID!): Rating!
   }
 
   type Mutation {
@@ -43,7 +43,7 @@ type Query {
     id: ID
     title: String!
     release_year: Int!
-    genre: [ID]
+    genres: [ID]
     platforms: [ID]!
     rating: ID
     developers: [ID]!

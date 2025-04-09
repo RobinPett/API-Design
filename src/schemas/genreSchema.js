@@ -6,8 +6,8 @@
 
 export const genreSchema = `
   type Query {
-    genres: [Genre]
-    genre(id: ID!): Genre
+    genres: [Genre]!
+    genre(id: ID!): Genre!
   }
 
   type Genre {

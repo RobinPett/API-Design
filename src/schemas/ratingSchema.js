@@ -6,8 +6,8 @@
 
 export const ratingSchema = `
   type Query {
-    ratings: [Rating]
-    rating(id: ID, gameId: ID): Rating
+    ratings: [Rating]!
+    rating(id: ID, gameId: ID): Rating!
   }
 
   type Rating {
