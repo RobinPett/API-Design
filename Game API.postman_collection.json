@@ -34,8 +34,7 @@
 									"let adjustedUserEmail = adjustedUsername + \"@test.com\"\r",
 									"\r",
 									"pm.collectionVariables.set('newUsername', adjustedUsername)\r",
-									"pm.collectionVariables.set('newUserEmail', adjustedUserEmail)\r",
-									"pm.collectionVariables.set('existingUserEmail', adjustedUserEmail)"
+									"pm.collectionVariables.set('newUserEmail', adjustedUserEmail)"
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -51,14 +50,7 @@
 									"\r",
 									"let response = pm.response.json();\r",
 									"\r",
-									"pm.collectionVariables.set('newUserId', response.data.registerUser.id);\r",
-									"\r",
-									"// Add new user details to existing user variables\r",
-									"let newUsername = pm.collectionVariables.get(\"newUsername\")\r",
-									"let newUserPassword = pm.collectionVariables.get(\"newUserPassword\")\r",
-									"\r",
-									"pm.collectionVariables.set('existingUsername', newUsername)\r",
-									"pm.collectionVariables.set('existingUserPassword', newUserPassword)"
+									"pm.collectionVariables.set('newUserId', response.data.registerUser.id);"
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -2981,17 +2973,17 @@
 		},
 		{
 			"key": "existingUserEmail",
-			"value": "",
+			"value": "existingUser@test.com",
 			"type": "string"
 		},
 		{
 			"key": "existingUsername",
-			"value": "",
+			"value": "existingUsername",
 			"type": "string"
 		},
 		{
 			"key": "existingUserPassword",
-			"value": "",
+			"value": "existingPassword123",
 			"type": "string"
 		},
 		{
