@@ -5,6 +5,8 @@ import { fastifyConfig } from './config/fastify.js'
 import { connectToDatabase } from './config/mongoose.js'
 import fastifyHelmet from '@fastify/helmet'
 import fastifyRateLimit from '@fastify/rate-limit'
+import fastifyCors from '@fastify/cors'
+import { corsConfig } from './config/cors.js'
 
 const fastifyApp = fastify(fastifyConfig)
 
@@ -21,6 +23,9 @@ await fastifyApp.register(fastifyRateLimit, {
   max: 100,
   timeWindow: '1 minute',
 })
+
+// Register CORS
+await fastifyApp.register(fastifyCors, corsConfig)
 
 // Error handling
 fastifyApp.setErrorHandler((error, request, reply) => {

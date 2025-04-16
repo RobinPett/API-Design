@@ -42,6 +42,7 @@ export class MongooseRepositoryBase {
    */
   async get (filter, projection = null, options = null) {
     try {
+      console.log(filter)
       const documents = await this.#model
         .find(filter, projection, options)
         .exec()
@@ -51,6 +52,7 @@ export class MongooseRepositoryBase {
       if (!documents) throw new NotFoundError('Documents not found')
       return documents
     } catch (error) {
+      console.log('Error:', error)
       if (error instanceof NotFoundError) throw error
       throw new RepositoryError('Failed to get documents: ' + error )
     }
