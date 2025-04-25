@@ -6,6 +6,7 @@
 
 import { AuthorizationError } from "../lib/errors/AuthorizationError.js"
 import { NotFoundError } from "../lib/errors/NotFoundError.js"
+import { ValidationError } from "../lib/errors/ValidationError.js"
 
 /**
  * Class representing a game service.
@@ -33,10 +34,21 @@ export class GameService {
      * @param {object} filter - Filter object to filter games
      * @return {Array} - Array of games
      */
-    async getGames(filter, limit) {
+    async getGames(filter, limit, page = 1) {
         // Check if contents of filter is undefined or null
         console.log('Filter:', filter)
-        const options = { limit: limit }
+
+        // Check page
+        if (page < 1) throw new ValidationError('Page must be greater than 0')
+
+        // Setup options for pagination
+        const options = {}
+        if (limit !== null && limit !== undefined) {
+            const skip = (page - 1) * limit
+            options.skip = skip
+            options.limit = limit
+        }
+        
         return await this._repository.get(filter, null, options)
     }
 
