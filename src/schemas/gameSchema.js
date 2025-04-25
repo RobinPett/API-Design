@@ -6,7 +6,7 @@
 
 export const gameSchema = `
   type Query {
-    games(release_year: Int, limit: Int, page: Int): [Game]!
+    games(release_year: Int, genre: String, limit: Int, page: Int): [Game]!
     game(id: ID!): Game!
   }
 
