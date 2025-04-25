@@ -25,7 +25,7 @@ const schema = new mongoose.Schema({
 })
 
 schema.add(BASE_SCHEMA)
-schema.index({ createdAt: -1 })
+schema.index({ release_year: 1, 'genres.name': 1, 'platforms.name': 1, 'rating.text': 1 })
 
 schema.pre('save', async function (next) {
   if (!this.id) {
