@@ -8,6 +8,7 @@ export const gameSchema = `
   type Query {
     games(release_year: Int, genre: String, limit: Int, page: Int): [Game]!
     game(id: ID!): Game!
+    totalGames(release_year: Int, genre: String): Int!
   }
 
   type Mutation {

@@ -7,6 +7,7 @@ type Query {
     developer(id: ID!): Developer!
     games(release_year: Int, genre: String, limit: Int, page: Int): [Game]!
     game(id: ID!): Game!
+    totalGames: Int!
     platforms: [Platform]!
     platform(id: ID!): Platform!
     genres: [Genre]!

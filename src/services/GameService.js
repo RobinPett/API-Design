@@ -48,7 +48,7 @@ export class GameService {
             options.skip = skip
             options.limit = limit
         }
-        
+
         return await this._repository.get(filter, null, options)
     }
 
@@ -60,6 +60,19 @@ export class GameService {
      */
     async getGame(id) {
         return await this._repository.getById({ id })
+    }
+
+    /**
+     * Get total count of games.
+     * 
+     * @param {object} filter - Filter object to filter games
+     * @return {Array} - Array of total count of games
+     */
+    async getTotalCount(filter) {
+        console.log('Filter:', filter)
+
+        const totalCount = await this._repository.getTotalCount(filter)
+        return totalCount
     }
 
     /**
@@ -75,7 +88,7 @@ export class GameService {
 
             // Find genres, platform, rating and developers from respective service based on ID in data
             // TODO: Enum for developer, platform, genres, rating
-            const allDevelopers = await this.#fetchResource('developer', developers) 
+            const allDevelopers = await this.#fetchResource('developer', developers)
             const allPlatforms = await this.#fetchResource('platform', platforms)
             const allGenres = await this.#fetchResource('genre', genres)
             const ratingObject = await this.#fetchResource('rating', rating)
@@ -128,12 +141,12 @@ export class GameService {
             const game = await this.getGame(id)
 
             if (!game) throw new NotFoundError('Game not found')
-    
+
             // Extracting the properties from the data object
             const updatedGameData = await this.#verifyUpdatedData(data)
-    
+
             console.log('Updated game data:', updatedGameData)
-    
+
             return await this._repository.update(id, updatedGameData)
         } catch (error) {
             console.error('Error updating game:', error)

@@ -33,6 +33,12 @@ export const gameResolvers = {
     },
     game: async (_, { id }, { container }) => {
       return await getGameService(container).getGame(id)
+    },
+    totalGames: async (_, { release_year, genre }, { container }) => {
+      const filter = {}
+      if (release_year) filter.release_year = release_year
+      if (genre) filter.genres = { $elemMatch: {name: genre} } // MongoDB query for array of genres
+      return await getGameService(container).getTotalCount(filter)
     }
   },
   Game: {

@@ -85,6 +85,18 @@ export class MongooseRepositoryBase {
   }
 
   /**
+   * Get total count of documents.
+   */
+  async getTotalCount(filter) {
+    try {
+      const totalCount = await this.#model.countDocuments(filter).exec()
+      return totalCount
+    } catch (error) {
+      throw new RepositoryError('Failed to get total count: ' + error)
+    }
+  }
+
+  /**
    * Creates a new document in the database.
    *
    * @param {object} data 
