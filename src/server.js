@@ -7,11 +7,15 @@ import fastifyHelmet from '@fastify/helmet'
 import fastifyRateLimit from '@fastify/rate-limit'
 import fastifyCors from '@fastify/cors'
 import { corsConfig } from './config/cors.js'
+import mercuriusCache from 'mercurius-cache'
+import { cacheConfig } from './config/cache.js'
 
 const fastifyApp = fastify(fastifyConfig)
 
 // Register mercurius for GraphQL adaptation
 await fastifyApp.register(mercurius, mercuriousConfig)
+
+await fastifyApp.register(mercuriusCache, cacheConfig)
 
 // Register helmet for security headers
 await fastifyApp.register(fastifyHelmet, {
